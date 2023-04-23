@@ -26,7 +26,7 @@
 		<AppBar background="bg-surface-800">
 			<svelte:fragment slot="lead">
 				<div class="text-surface-900-50--token">
-					<a href="/" aria-label="Home Page" class="text-black dark:text-white"> 
+					<a href="/" aria-label="Home Page" class="text-white"> 
 						<img class="h-12 " src="/fleks-ko-logo-medium.png" alt="Fleks Ko Logo"/>
 					 </a>
 				</div>
