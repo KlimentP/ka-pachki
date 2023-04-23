@@ -1,6 +1,6 @@
 
 <div class="container h-full mx-auto flex justify-center items-center">
 	<div class="space-y-5">
-		Flex Ko
+		This is view all orders
 	</div>
 </div>
