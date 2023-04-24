@@ -1,3 +1,23 @@
+<script lang="ts">
+	import AutoCompleteSingle from '$lib/components/AutoCompleteSingle.svelte';
+	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
+
+	let customerOptions: AutocompleteOption[] = [
+		{ value: 'rodopea', label: 'Rodopea' },
+		{ value: 'bor_chvor', label: 'Bor Chvor' },
+		{ value: 'madjarov', label: 'Madjarov' },
+		{ value: 'kravarkata', label: 'Kravarkata' },
+		{ value: 'verea', label: 'Verea' },
+	];
+    let designOptions: AutocompleteOption[] = [
+		{ value: 'mleko', label: 'Mleko' },
+		{ value: 'mazno_mleko', label: 'Mazno Mleko' },
+		{ value: 'niskomasleno_mleko', label: 'Niskomasleno Mleko' },
+		{ value: 'kravarkata_v_ugula', label: 'Kravarkata v Ugula' },
+		{ value: 'dedo_liben', label: 'Dedo Liben' },
+	];
+</script>
+
 <div class="container h-full mx-auto flex flex-col justify-center items-center max-sm:p-4">
 	<h2 class="mb-2">Create Order</h2>
 	<form class="w-full max-w-lg">
@@ -6,7 +26,7 @@
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="date-updated">
               Date Updated
             </label>
-            <input class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="date-updated" type="date" placeholder="Date Updated">
+            <input class="" id="date-updated" type="date" placeholder="Date Updated">
           </div>
         </div>
         <div class="flex flex-wrap -mx-3 mb-6">
@@ -14,7 +34,7 @@
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="date-closed">
               Date Closed
             </label>
-            <input class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="date-closed" type="date" placeholder="Date Closed">
+            <input class="" id="date-closed" type="date" placeholder="Date Closed">
           </div>
         </div> -->
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -25,12 +45,7 @@
 				>
 					Customer
 				</label>
-				<input
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="customer-id"
-					type="text"
-					placeholder="Customer ID"
-				/>
+				<AutoCompleteSingle options={customerOptions} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -41,12 +56,7 @@
 				>
 					Design
 				</label>
-				<input
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="design"
-					type="text"
-					placeholder="Design"
-				/>
+				<AutoCompleteSingle options={designOptions} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -54,12 +64,7 @@
 				<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="qty">
 					Quantity
 				</label>
-				<input
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="qty"
-					type="number"
-					placeholder="Quantity"
-				/>
+				<input class="input" id="qty" type="number" placeholder="Quantity" />
 			</div>
 		</div>
 
@@ -67,16 +72,21 @@
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-					for="type"
+					for="material"
 				>
-					Type
+					Material
 				</label>
-				<input
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="type"
-					type="text"
-					placeholder="Type"
-				/>
+				<select
+					class="select block appearance-none w-full bg-sky-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+					id="material"
+					size="4"
+					value="Lid"
+				>
+					<option value="Lid">Lid</option>
+					<option value="Label">Label</option>
+					<option value="Butter">Butter</option>
+					<option value="Embossed Lid">Embossed Lid</option>
+				</select>
 			</div>
 		</div>
 
@@ -88,10 +98,7 @@
 				>
 					Status
 				</label>
-				<select
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="status"
-				>
+				<select class="select" id="status" value="Scheduled">
 					<option value="Scheduled">Scheduled</option>
 					<option value="In progress">In progress</option>
 					<option value="Completed">Completed</option>
@@ -106,12 +113,7 @@
 				>
 					Units Already Produced
 				</label>
-				<input
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="units-produced"
-					type="number"
-					placeholder="Units Produced"
-				/>
+				<input class="input" id="units-produced" type="number" placeholder="Units Produced" />
 			</div>
 		</div>
 
@@ -120,7 +122,7 @@
               <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="created-by">
                 Created By
               </label>
-              <input class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="created-by" type="text" placeholder="Created By">
+              <input class="" id="created-by" type="text" placeholder="Created By">
             </div>
           </div> -->
 		<!-- <div class="flex flex-wrap -mx-3 mb-6">
@@ -128,7 +130,7 @@
               <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="closed-by">
                 Closed By
               </label>
-              <input class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="closed-by" type="text" placeholder="Closed By">
+              <input class="" id="closed-by" type="text" placeholder="Closed By">
             </div>
           </div> -->
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -140,10 +142,7 @@
 					>
 						Urgent
 					</label>
-					<select
-						class="block appearance-none w-full bg-sky-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-						id="urgent"
-					>
+					<select class="select" id="urgent">
 						<option value="No">No</option>
 						<option value="Yes">Yes</option>
 					</select>
@@ -173,14 +172,10 @@
 				>
 					Deadline
 				</label>
-				<input
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="deadline"
-					type="date"
-				/>
+				<input class="input" id="deadline" type="date" />
 			</div>
 		</div>
-        <div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -188,11 +183,7 @@
 				>
 					Notes
 				</label>
-				<textarea
-					class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-					id="notes"
-					placeholder="Notes"
-				/>
+				<textarea class="textarea" id="notes" placeholder="Notes" />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -200,13 +191,13 @@
                           <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="order-id">
                             Order ID
                           </label>
-                          <input class="appearance-none block w-full bg-sky-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="order-id" type="text" placeholder="Order ID">
+                          <input class="" id="order-id" type="text" placeholder="Order ID">
                         </div>
                       </div> -->
 			<div class="flex flex-wrap -mx-3 mb-2">
 				<div class="w-full px-3">
 					<button
-						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						class="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 						type="submit"
 					>
 						Submit
