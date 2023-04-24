@@ -19,9 +19,11 @@
 <div class="card w-48 shadow-xl py-2" data-popup={comboboxValue}>
 	<ListBox rounded="rounded-none">
         {#each listItems as item}
-            <ListBoxItem bind:group={comboboxValue} value={comboboxValue} name={item.label}>
-                <a href={item.url}>{item.label}</a>
-            </ListBoxItem>
+                <a href={item.url}>
+                    <ListBoxItem bind:group={comboboxValue} value={comboboxValue} name={item.label}>
+                        {item.label}
+                    </ListBoxItem>
+                </a>
         {/each}
 	</ListBox>
 	<div class="arrow bg-surface-100-800-token" />
