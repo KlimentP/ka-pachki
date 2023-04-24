@@ -5,10 +5,36 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	// Most of your app wide CSS should be put in this file
 	import '../app.postcss';
-	import { AppShell, AppBar, LightSwitch } from '@skeletonlabs/skeleton';
+	import { invalidate } from '$app/navigation'
+	import { onMount } from 'svelte'
+	import type { LayoutData } from './$types'
+
+	export let data: LayoutData
+
+	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
 	import ComboBox from '$lib/components/ComboBox.svelte';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
+
+
+	import { page } from '$app/stores';
+
+	$: ({ supabase, session } = data)
+	
+	function signout() {
+		supabase.auth.signOut();
+	}
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth')
+			}
+		})
+
+		return () => data.subscription.unsubscribe()
+	})
+
+
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 	const designDropdown = [
 		{ url: '/designs/create', label: 'Create' },
@@ -33,9 +59,13 @@
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<div class="flex items-center gap-2">
+					{#if $page.data.session}
 					<ComboBox comboboxValue={'Designs'} listItems={designDropdown} />
 					<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} />
-
+					<button type="button" class="btn text-slate-200 hover:text-primary-500"  on:click={signout}>Sign Out</button>
+					{:else}
+					<a href="/login" class="btn text-slate-200 hover:text-primary-500">Sign In</a>
+					{/if}
 					<!-- <LightSwitch /> -->
 				</div></svelte:fragment
 			>
