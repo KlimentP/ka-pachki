@@ -5,7 +5,6 @@
 	export let inputChipList: string[] = [];
 	export let options: AutocompleteOption[] =[];
     function onInputChipSelect(event: any): void {
-		console.log('onInputChipSelect', event.detail);
 		if (inputChipList.includes(event.detail.value) === false) {
 			inputChipList = [...inputChipList, event.detail.value];
 			inputChip = '';
