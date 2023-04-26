@@ -15,21 +15,21 @@ export interface Database {
           id: number
           material: string
           name: string
-          preferred_emplopyee: number | null
+          preferred_employee: number | null
         }
         Insert: {
           color_scheme: string[]
           id?: number
           material: string
           name: string
-          preferred_emplopyee?: number | null
+          preferred_employee?: number | null
         }
         Update: {
           color_scheme?: string[]
           id?: number
           material?: string
           name?: string
-          preferred_emplopyee?: number | null
+          preferred_employee?: number | null
         }
       }
       employees: {
