@@ -1,10 +1,14 @@
 import { supabaseClient } from "$lib/supabaseClient";
+import type { Database } from '../../../supabase';
 
-export async function selectAll(table: string) {
-    const {data} = await supabaseClient
-    .from(table)
-    .select()
-  return {
-    tableData: data ?? [],
-  };
-}
+type TableName = keyof Database['public']['Tables']
+
+export async function selectAll(
+    table: TableName,
+  ): Promise<Database['public']['Tables'][TableName]['Row'][]> {
+    const { data } = await supabaseClient
+      .from(table)
+      .select("*");
+  
+    return data ?? [];
+  }
