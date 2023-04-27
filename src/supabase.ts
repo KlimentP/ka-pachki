@@ -9,6 +9,34 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      colors: {
+        Row: {
+          name: string
+        }
+        Insert: {
+          name: string
+        }
+        Update: {
+          name?: string
+        }
+      }
+      customers: {
+        Row: {
+          id: number
+          name: string
+          notes: string | null
+        }
+        Insert: {
+          id?: number
+          name: string
+          notes?: string | null
+        }
+        Update: {
+          id?: number
+          name?: string
+          notes?: string | null
+        }
+      }
       designs: {
         Row: {
           color_scheme: string[]
@@ -48,9 +76,10 @@ export interface Database {
       }
       orders: {
         Row: {
+          assigned_employee: number | null
           closed_by: string | null
           created_by: string | null
-          customer_id: string | null
+          customer_id: number | null
           date_closed: string | null
           date_created: string | null
           date_updated: string | null
@@ -65,9 +94,10 @@ export interface Database {
           urgent: boolean
         }
         Insert: {
+          assigned_employee?: number | null
           closed_by?: string | null
           created_by?: string | null
-          customer_id?: string | null
+          customer_id?: number | null
           date_closed?: string | null
           date_created?: string | null
           date_updated?: string | null
@@ -82,9 +112,10 @@ export interface Database {
           urgent?: boolean
         }
         Update: {
+          assigned_employee?: number | null
           closed_by?: string | null
           created_by?: string | null
-          customer_id?: string | null
+          customer_id?: number | null
           date_closed?: string | null
           date_created?: string | null
           date_updated?: string | null
@@ -103,23 +134,25 @@ export interface Database {
     Views: {
       orders_full: {
         Row: {
+          assigned_employee: number | null
           closed_by: string | null
+          closed_by_email: string | null
           color_scheme: string[] | null
+          creaated_by_email: string | null
           created_by: string | null
-          created_by_email: string | null
-          customer_id: string | null
+          customer_id: number | null
+          customer_name: string | null
           date_closed: string | null
           date_created: string | null
           date_updated: string | null
           deadline: string | null
           design_id: number | null
+          design_name: string | null
           duration_order: number | null
-          id: number | null
           material: string | null
-          name: string | null
           notes: string | null
           order_id: string | null
-          preferred_emplopyee: number | null
+          preferred_employee_name: string | null
           quantity: number | null
           status: string | null
           units_already_produced: number | null
