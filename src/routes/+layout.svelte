@@ -20,7 +20,7 @@
 	import { page } from '$app/stores';
 
 	$: ({ supabase, session } = data)
-	
+
 	function signout() {
 		supabase.auth.signOut();
 	}
@@ -49,7 +49,7 @@
 <AppShell>
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
-		<AppBar background="bg-surface-800">
+		<AppBar background="bg-slate-950">
 			<svelte:fragment slot="lead">
 				<div class="text-surface-900-50--token">
 					<a href="/" aria-label="Home Page" class="text-white"> 
@@ -64,7 +64,7 @@
 					<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} />
 					<button type="button" class="btn text-slate-200 hover:text-primary-500"  on:click={signout}>Sign Out</button>
 					{:else}
-					<a href="/login" class="btn text-slate-200 hover:text-primary-500">Sign In</a>
+					<a href="/login" class="btn text-slate-300 hover:text-primary-500">Sign In</a>
 					{/if}
 					<!-- <LightSwitch /> -->
 				</div></svelte:fragment
@@ -72,7 +72,7 @@
 		</AppBar>
 	</svelte:fragment>
 	<slot />
-	<footer class="py-4 shadow-lg bg-surface-800 max-sm:mt-12 max-sm:px-4">
+	<footer class="py-4 shadow-lg bg-slate-950 max-sm:mt-12 max-sm:px-4">
 		<div class="container mx-auto flex items-center justify-between">
 			<div class="flex items-center">
 				<div class="mr-4 text-white">Flex Ko</div>

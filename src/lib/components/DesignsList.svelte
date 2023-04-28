@@ -12,13 +12,12 @@
 	};
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 p-16 overflow-y-auto max-h-full">
 	{#each items as item (item.name)}
 		<div class="card card-hover rounded-xl shadow-lg">
-			<header class="card-header bg-primary-600 rounded-t-lg shadow-lg p-4">
-				<h3 class="text-lg font-bold mb-2 text-slate-300">
+			<header class="card-header bg-slate-800  rounded-t-lg shadow-lg p-4 
+      text-lg font-bold mb-2 text-slate-300 hover:text-primary-500" >
 					{capitalizeString(item.name)}
-				</h3>
 			</header>
 			<section class="p-4">
 				<div class="flex flex-wrap gap-2 py-4">

@@ -13,14 +13,14 @@
 	};
 </script>
 
-<button class="btn variant-filled" use:popup={popupCombobox}>
+<button class="btn variant-ghost-primary text-slate-300 hover:text-primary-500" use:popup={popupCombobox}>
 	{comboboxValue ?? 'Trigger'}
 </button>
-<div class="card w-48 shadow-xl py-2" data-popup={comboboxValue}>
-	<ListBox rounded="rounded-none">
+<div class="card  w-48 shadow-xl py-2  bg-slate-950" data-popup={comboboxValue}>
+	<ListBox  rounded="rounded-none">
         {#each listItems as item}
-                <a href={item.url}>
-                    <ListBoxItem bind:group={comboboxValue} value={comboboxValue} name={item.label}>
+                <a  href={item.url}>
+                    <ListBoxItem class="bg-slate-950 text-slate-300 hover:text-primary-500" bind:group={comboboxValue} value={comboboxValue} name={item.label}>
                         {item.label}
                     </ListBoxItem>
                 </a>
