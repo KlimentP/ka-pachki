@@ -1,49 +1,48 @@
 /** @type {import('./$types').Actions} */
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { supabaseClient } from "$lib/supabaseClient";
+import { message, setError, superValidate } from 'sveltekit-superforms/server';
+import { ordersInsertSchema } from '../../../schemas';
+import { removeNullValues } from '$lib/utils/generic';
 
 export async function load(){
     const {data: employees} =  await supabaseClient.from('employees').select('*')
     const {data: designs} =  await supabaseClient.from('designs').select('name,id')
     const {data: customers} =  await supabaseClient.from('customers').select('name,id')
+	const form = superValidate(ordersInsertSchema);
+
 
     return {employees: employees ?? [],
             designs: designs ?? [],
             customers: customers ?? [],
+            form
             };
 }
 
-const validate = (submitData: any) => {
-    const errors: any = {};
-    if (new Date(submitData?.deadline).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ){
-        errors.deadline = 'Please select a date in the future';
-    }
-    if (submitData?.quantity <= 0){
-        errors.quantity = 'Please enter a valid number';
-    }
-    if (submitData?.units_already_produced < 0){
-        errors.units_already_produced = 'Please enter a valid number';
-    }
-    return errors;
-} 
-
-
 export const actions = {
     default: async ({request, locals}) => {
-        const formData = await request.formData();
+        
+		const form = await superValidate(request, ordersInsertSchema);
+		console.log(form)
+        if (!form.valid) return fail(400, { form });
+        let submitData = removeNullValues(form.data)
         const session = await locals.getSession()
         const creator = {created_by: session?.user.id}
-        const submitData = {...Object.fromEntries(formData.entries()), ...creator}
-
-        const errors = validate(submitData);
-        if (Object.keys(errors).length > 0) {
-            return fail(422, {...submitData, errors});
-        }
-
-        const {error} = await locals.supabase.from('orders').insert([submitData]);
+        submitData = {...submitData, ...creator}
+		if (!form.data.order_id) {
+            // CREATE order
+			const { error } = await locals.supabase.from('orders').insert([submitData]);
+			if (error) {
+				return setError(form, null, error.message);
+			}
+			return message(form, 'Order created!');
+		} else {
+            // UPDATE order
+            const { error } = await locals.supabase.from('orders').update(submitData).eq("id", form.data.order_id );
             if (error) {
-                return fail(422, {...submitData, errors: error});
+                return setError(form, null, error.message);
             }
-            throw(redirect(303, '/orders'))
+            return message(form, 'order updated!');
+        }
         }
     };

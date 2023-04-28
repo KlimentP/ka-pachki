@@ -35,7 +35,7 @@
 			</section>
 			<div class="card-footer">
 				<div class="text-lg text-slate-800">
-					Preferred Employee: {item.preferred_employee || 'None'}
+					Preferred Employee: {item.preferred_employee_id || 'None'}
 				</div>
 			</div>
 		</div>

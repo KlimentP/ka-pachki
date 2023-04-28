@@ -3,48 +3,20 @@
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	import { dbToAutocomplete, capitalizeString } from '$lib/utils/generic';
 	import { fade } from 'svelte/transition';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { page } from '$app/stores';
 	export let data;
-	export let form;
 
 	let customerOptions: AutocompleteOption[] = dbToAutocomplete(data.customers);
 	let designOptions: AutocompleteOption[] = dbToAutocomplete(data.designs);
 	let employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
-
+	const { form, errors, constraints, enhance, delayed, message, empty } = superForm(data.form);
+	console.log(designOptions);
 </script>
 
 <div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center max-sm:p-4">
 	<h2 class="mb-2">Create Order</h2>
-	{#if form?.errors}
-		<aside
-			transition:fade|local={{ duration: 500 }}
-			class="alert variant-filled-error w-full max-w-lg"
-		>
-			<!-- Message -->
-			<div class="alert-message">
-				<h3>Error</h3>
-				{#each Object.entries(form.errors) as [key, value]}
-					<p>{capitalizeString(key)}: {value}</p>
-				{/each}
-			</div>
-		</aside>
-	{/if}
 	<form class="w-full max-w-lg" method="POST">
-		<!-- <div class="flex flex-wrap -mx-3 mb-6">
-          <div class="w-full px-3">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="date-updated">
-              Date Updated
-            </label>
-            <input class="" id="date-updated" type="date" placeholder="Date Updated">
-          </div>
-        </div>
-        <div class="flex flex-wrap -mx-3 mb-6">
-          <div class="w-full px-3">
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="date-closed">
-              Date Closed
-            </label>
-            <input class="" id="date-closed" type="date" placeholder="Date Closed">
-          </div>
-        </div> -->
 		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
@@ -53,7 +25,7 @@
 				>
 					Customer
 				</label>
-				<AutoCompleteSingle options={customerOptions} formName="customer_id" />
+				<AutoCompleteSingle form={$form} options={customerOptions} formName="customer_id" />
 			</div>
 		</div>
 
@@ -65,7 +37,7 @@
 				>
 					Design
 				</label>
-				<AutoCompleteSingle options={designOptions} formName="design_id" />
+				<AutoCompleteSingle form={$form}  options={designOptions} formName="design_id" />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -80,33 +52,11 @@
 					type="number"
 					name="quantity"
 					placeholder="Quantity"
-					value={form?.quantity ?? 0}
+					bind:value={$form.quantity}
+					{...$constraints.quantity}
 				/>
 			</div>
 		</div>
-
-		<!-- <div class="flex flex-wrap -mx-3 mb-6">
-			<div class="w-full px-3">
-				<label
-					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-					for="material"
-				>
-					Material
-				</label>
-				<select
-					class="select block appearance-none w-full bg-sky-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-					id="material"
-					size="4"
-					name="material"
-					value={form?.material ?? 'lid'}
-				>
-					<option value="lid">Lid</option>
-					<option value="label">Label</option>
-					<option value="butter">Butter</option>
-					<option value="embossed_lid">Embossed Lid</option>
-				</select>
-			</div>
-		</div> -->
 
 		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
@@ -116,7 +66,13 @@
 				>
 					Status
 				</label>
-				<select class="select" id="status" name="status" value={form?.status ?? 'scheduled'}>
+				<select
+					class="select"
+					id="status"
+					name="status"
+					bind:value={$form.status }
+					{...$constraints.status}
+				>
 					<option value="scheduled">Scheduled</option>
 					<option value="in_progress">In progress</option>
 					<option value="completed">Completed</option>
@@ -136,7 +92,8 @@
 					id="units-produced"
 					name="units_already_produced"
 					type="number"
-					value={form?.units_already_produced ?? 0}
+					bind:value={$form.units_already_produced}
+					{...$constraints.units_already_produced}
 				/>
 			</div>
 		</div>
@@ -148,30 +105,19 @@
 				>
 					Specifically Assign Employee
 				</label>
-				<select class="select" name="assigned_employee" size="4" value={form?.assigned_employee ?? ""}>
+				<select
+					class="select"
+					name="assigned_employee_id"
+					size="4"
+					bind:value={$form.assigned_employee_id}
+					{...$constraints.assigned_employee_id}
+				>
 					{#each employeeOptions as employee}
 						<option value={employee.value}>{employee.label}</option>
 					{/each}
 				</select>
 			</div>
 		</div>
-
-		<!-- <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full px-3">
-              <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="created-by">
-                Created By
-              </label>
-              <input class="" id="created-by" type="text" placeholder="Created By">
-            </div>
-          </div> -->
-		<!-- <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full px-3">
-              <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="closed-by">
-                Closed By
-              </label>
-              <input class="" id="closed-by" type="text" placeholder="Closed By">
-            </div>
-          </div> -->
 		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<div class="relative">
@@ -181,7 +127,7 @@
 					>
 						Urgent
 					</label>
-					<select class="select" id="urgent" name="urgent" value={form?.urgent ?? 'false'}>
+					<select class="select" id="urgent" name="urgent" bind:value={$form.urgent} {...$constraints.urgent}>
 						<option value="false">No</option>
 						<option value="true">Yes</option>
 					</select>
@@ -216,7 +162,8 @@
 					id="deadline"
 					type="date"
 					name="deadline"
-					value={form?.deadline ?? ''}
+					bind:value={$form.deadline}
+					{...$constraints.deadline}
 				/>
 			</div>
 		</div>
@@ -228,17 +175,25 @@
 				>
 					Notes
 				</label>
-				<textarea class="textarea" id="notes" name="notes" value={form?.notes ?? ''} />
+				<textarea class="textarea" id="notes" name="notes" bind:value={$form.notes} {...$constraints.notes} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
-			<!-- <div class="w-full px-3">
-                          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="order-id">
-                            Order ID
-                          </label>
-                          <input class="" id="order-id" type="text" placeholder="Order ID">
-                        </div>
-                      </div> -->
+			{#if Object.keys($errors).length > 0}
+				<aside class="alert variant-filled-error p-4" transition:fade|local={{ duration: 500 }}>
+					{JSON.stringify($errors)}
+				</aside>
+			{/if}
+			{#if $message}
+				<aside
+					transition:fade|local={{ duration: 500 }}
+					class="alert"
+					class:variant-filled-success={$page.status < 400}
+					class:variant-filled-error={$page.status >= 400}
+				>
+					<h3>{$message}</h3>
+				</aside>
+			{/if}
 			<div class="flex flex-wrap -mx-3 mb-2">
 				<div class="w-full px-3">
 					<button

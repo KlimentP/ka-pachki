@@ -43,7 +43,7 @@ export const designsRowSchema = z.object({
 	id: z.number(),
 	material: z.string(),
 	name: z.string(),
-	preferred_employee: z.number().nullable()
+	preferred_employee_id: z.number().nullable()
 });
 
 export const designsInsertSchema = z.object({
@@ -51,7 +51,7 @@ export const designsInsertSchema = z.object({
 	id: z.number().optional(),
 	material: z.string(),
 	name: z.string(),
-	preferred_employee: z.number().optional().nullable()
+	preferred_employee_id: z.number().optional().nullable()
 });
 
 export const designsUpdateSchema = z.object({
@@ -59,7 +59,7 @@ export const designsUpdateSchema = z.object({
 	id: z.number().optional(),
 	material: z.string().optional(),
 	name: z.string().optional(),
-	preferred_employee: z.number().optional().nullable()
+	preferred_employee_id: z.number().optional().nullable()
 });
 
 export const employeesRowSchema = z.object({
@@ -78,7 +78,7 @@ export const employeesUpdateSchema = z.object({
 });
 
 export const ordersRowSchema = z.object({
-	assigned_employee: z.number().nullable(),
+	assigned_employee_id: z.number().nullable(),
 	closed_by: z.string().nullable(),
 	created_by: z.string().nullable(),
 	customer_id: z.number().nullable(),
@@ -97,7 +97,7 @@ export const ordersRowSchema = z.object({
 });
 
 export const ordersInsertSchema = z.object({
-	assigned_employee: z.number().optional().nullable(),
+	assigned_employee_id: z.number().optional().nullable(),
 	closed_by: z.string().optional().nullable(),
 	created_by: z.string().optional().nullable(),
 	customer_id: z.number().optional().nullable(),
@@ -110,13 +110,13 @@ export const ordersInsertSchema = z.object({
 	notes: z.string().optional().nullable(),
 	order_id: z.string().optional(),
 	quantity: z.number().optional().nullable(),
-	status: z.string().optional().nullable(),
+	status: z.string().optional().nullable().default('scheduled'),
 	units_already_produced: z.number().optional(),
 	urgent: z.boolean().optional()
 });
 
 export const ordersUpdateSchema = z.object({
-	assigned_employee: z.number().optional().nullable(),
+	assigned_employee_id: z.number().optional().nullable(),
 	closed_by: z.string().optional().nullable(),
 	created_by: z.string().optional().nullable(),
 	customer_id: z.number().optional().nullable(),
@@ -135,7 +135,7 @@ export const ordersUpdateSchema = z.object({
 });
 
 export const ordersFullRowSchema = z.object({
-	assigned_employee: z.number().nullable(),
+	assigned_employee_id: z.number().nullable(),
 	closed_by: z.string().nullable(),
 	closed_by_email: z.string().nullable(),
 	color_scheme: z.array(z.string()).nullable(),
@@ -153,7 +153,7 @@ export const ordersFullRowSchema = z.object({
 	material: z.string().nullable(),
 	notes: z.string().nullable(),
 	order_id: z.string().nullable(),
-	preferred_employee_name: z.string().nullable(),
+	preferred_employee_id_name: z.string().nullable(),
 	quantity: z.number().nullable(),
 	status: z.string().nullable(),
 	units_already_produced: z.number().nullable(),

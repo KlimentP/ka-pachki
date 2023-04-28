@@ -3,7 +3,7 @@
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	let inputChip = '';
 	
-	export let form;
+	export let form: any;
 	export let options: AutocompleteOption[] =[];
     export let formName: string;
 	export let inputChipList = form[formName];

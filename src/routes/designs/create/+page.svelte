@@ -94,19 +94,19 @@
 				</label>
 				<select
 					class="select"
-					name="preferred_employee"
+					name="preferred_employee_id"
 					size="3"
-					bind:value={$form.preferred_employee}
-					data-invalid={$errors.preferred_employee}
-					{...$constraints.preferred_employee}
+					bind:value={$form.preferred_employee_id}
+					data-invalid={$errors.preferred_employee_id}
+					{...$constraints.preferred_employee_id}
 				>
 					{#each employeeOptions as employee}
 						<option value={employee.value}>{employee.label}</option>
 					{/each}
 				</select>
 			</div>
-			{#if $errors.preferred_employee}<span class="text-error-500"
-					>{$errors.preferred_employee}</span
+			{#if $errors.preferred_employee_id}<span class="text-error-500"
+					>{$errors.preferred_employee_id}</span
 				>{/if}
 		</div>
 		{#if Object.keys($errors).length > 0}

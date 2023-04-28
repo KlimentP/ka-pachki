@@ -1,10 +1,13 @@
 <script lang="ts">
-	export let data;
+	import Icon from '@iconify/svelte';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
 	let { tableData } = data;
 
 	// let filter = '';
 	// let filteredData = tableData;
-	const keysToFilter = ["date_created", "status", "customer_name", "quantity", "design_name", "material", "color_scheme", "deadline", "design_name"];
+	const keysToFilter = ["date_created",  "status", "customer_name", "quantity", "design_name", "material", "color_scheme", "deadline", "design_name", "assigned_employee", "preferred_employee", "order_id",];
 
 	function filterObjectByKeys(obj, keys) {
 	return keys.reduce((result, key) => {
@@ -54,7 +57,16 @@
 				{#each filteredData as item, index}
 					<tr>
 						<td>
-							Coming Soon!
+							<button on:click={() => console.log(item.order_id)}>
+							<Icon  height=24 icon="carbon:task-complete" />
+							</button>
+							<button on:click={() => console.log(item.order_id)}>
+								<Icon class="text-red-500" height=24 icon="material-symbols:delete-forever-sharp" />
+							</button>
+							<button on:click={() => console.log(item.order_id)}>
+								<Icon height=24 icon="fluent:alert-urgent-16-filled" />
+							</button>
+
 							<!-- <button on:click={() => handleEdit(index)}>Edit</button>
 							<button on:click={() => handleDelete(index)}>Delete</button> -->
 						</td>
