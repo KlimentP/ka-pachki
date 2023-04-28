@@ -12,7 +12,7 @@
 	};
 </script>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 p-16 overflow-y-auto max-h-full">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 p-16 overflow-y-auto max-h-screen">
 	{#each items as item (item.name)}
 		<div class="card card-hover rounded-xl shadow-lg">
 			<header class="card-header bg-slate-800  rounded-t-lg shadow-lg p-4 

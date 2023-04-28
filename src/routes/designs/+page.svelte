@@ -1,6 +1,7 @@
 
 <script lang="ts">
 	import DesignsList from '$lib/components/DesignsList.svelte';
+
 	export let data;
 	let {tableData} = data;
 
