@@ -1,6 +1,12 @@
 
+<script lang="ts">
+	import DesignsList from '$lib/components/DesignsList.svelte';
+	export let data;
+	let {tableData} = data;
+
+
+	</script>
+
 <div class="container h-full mx-auto flex justify-center items-center">
-	<div class="space-y-5">
-		This is view all designs
-	</div>
+	<DesignsList items={tableData} />
 </div>
