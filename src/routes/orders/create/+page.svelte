@@ -1,26 +1,34 @@
 <script lang="ts">
 	import AutoCompleteSingle from '$lib/components/AutoCompleteSingle.svelte';
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
+	import { dbToAutocomplete, capitalizeString } from '$lib/utils/generic';
+	import { fade } from 'svelte/transition';
+	export let data;
+	export let form;
 
-	let customerOptions: AutocompleteOption[] = [
-		{ value: 'rodopea', label: 'Rodopea' },
-		{ value: 'bor_chvor', label: 'Bor Chvor' },
-		{ value: 'madjarov', label: 'Madjarov' },
-		{ value: 'kravarkata', label: 'Kravarkata' },
-		{ value: 'verea', label: 'Verea' },
-	];
-    let designOptions: AutocompleteOption[] = [
-		{ value: 'mleko', label: 'Mleko' },
-		{ value: 'mazno_mleko', label: 'Mazno Mleko' },
-		{ value: 'niskomasleno_mleko', label: 'Niskomasleno Mleko' },
-		{ value: 'kravarkata_v_ugula', label: 'Kravarkata v Ugula' },
-		{ value: 'dedo_liben', label: 'Dedo Liben' },
-	];
+	let customerOptions: AutocompleteOption[] = dbToAutocomplete(data.customers);
+	let designOptions: AutocompleteOption[] = dbToAutocomplete(data.designs);
+	let employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
+
 </script>
 
-<div class="container h-full mx-auto flex flex-col justify-center items-center max-sm:p-4">
+<div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center max-sm:p-4">
 	<h2 class="mb-2">Create Order</h2>
-	<form class="w-full max-w-lg">
+	{#if form?.errors}
+		<aside
+			transition:fade|local={{ duration: 500 }}
+			class="alert variant-filled-error w-full max-w-lg"
+		>
+			<!-- Message -->
+			<div class="alert-message">
+				<h3>Error</h3>
+				{#each Object.entries(form.errors) as [key, value]}
+					<p>{capitalizeString(key)}: {value}</p>
+				{/each}
+			</div>
+		</aside>
+	{/if}
+	<form class="w-full max-w-lg" method="POST">
 		<!-- <div class="flex flex-wrap -mx-3 mb-6">
           <div class="w-full px-3">
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="date-updated">
@@ -45,9 +53,10 @@
 				>
 					Customer
 				</label>
-				<AutoCompleteSingle options={customerOptions} />
+				<AutoCompleteSingle options={customerOptions} formName="customer_id" />
 			</div>
 		</div>
+
 		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
@@ -56,7 +65,7 @@
 				>
 					Design
 				</label>
-				<AutoCompleteSingle options={designOptions} />
+				<AutoCompleteSingle options={designOptions} formName="design_id" />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -64,11 +73,19 @@
 				<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="qty">
 					Quantity
 				</label>
-				<input class="input" id="qty" type="number" placeholder="Quantity" />
+				<input
+					required
+					class="input"
+					id="quantity"
+					type="number"
+					name="quantity"
+					placeholder="Quantity"
+					value={form?.quantity ?? 0}
+				/>
 			</div>
 		</div>
 
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<!-- <div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -80,15 +97,16 @@
 					class="select block appearance-none w-full bg-sky-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
 					id="material"
 					size="4"
-					value="Lid"
+					name="material"
+					value={form?.material ?? 'lid'}
 				>
-					<option value="Lid">Lid</option>
-					<option value="Label">Label</option>
-					<option value="Butter">Butter</option>
-					<option value="Embossed Lid">Embossed Lid</option>
+					<option value="lid">Lid</option>
+					<option value="label">Label</option>
+					<option value="butter">Butter</option>
+					<option value="embossed_lid">Embossed Lid</option>
 				</select>
 			</div>
-		</div>
+		</div> -->
 
 		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
@@ -98,10 +116,10 @@
 				>
 					Status
 				</label>
-				<select class="select" id="status" value="Scheduled">
-					<option value="Scheduled">Scheduled</option>
-					<option value="In progress">In progress</option>
-					<option value="Completed">Completed</option>
+				<select class="select" id="status" name="status" value={form?.status ?? 'scheduled'}>
+					<option value="scheduled">Scheduled</option>
+					<option value="in_progress">In progress</option>
+					<option value="completed">Completed</option>
 				</select>
 			</div>
 		</div>
@@ -113,7 +131,28 @@
 				>
 					Units Already Produced
 				</label>
-				<input class="input" id="units-produced" type="number" placeholder="Units Produced" />
+				<input
+					class="input"
+					id="units-produced"
+					name="units_already_produced"
+					type="number"
+					value={form?.units_already_produced ?? 0}
+				/>
+			</div>
+		</div>
+		<div class="flex flex-wrap -mx-3 mb-6">
+			<div class="w-full px-3">
+				<label
+					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+					for="material"
+				>
+					Specifically Assign Employee
+				</label>
+				<select class="select" name="assigned_employee" size="4" value={form?.assigned_employee ?? ""}>
+					{#each employeeOptions as employee}
+						<option value={employee.value}>{employee.label}</option>
+					{/each}
+				</select>
 			</div>
 		</div>
 
@@ -142,9 +181,9 @@
 					>
 						Urgent
 					</label>
-					<select class="select" id="urgent">
-						<option value="No">No</option>
-						<option value="Yes">Yes</option>
+					<select class="select" id="urgent" name="urgent" value={form?.urgent ?? 'false'}>
+						<option value="false">No</option>
+						<option value="true">Yes</option>
 					</select>
 					<div
 						class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -172,7 +211,13 @@
 				>
 					Deadline
 				</label>
-				<input class="input" id="deadline" type="date" />
+				<input
+					class="input"
+					id="deadline"
+					type="date"
+					name="deadline"
+					value={form?.deadline ?? ''}
+				/>
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -183,7 +228,7 @@
 				>
 					Notes
 				</label>
-				<textarea class="textarea" id="notes" placeholder="Notes" />
+				<textarea class="textarea" id="notes" name="notes" value={form?.notes ?? ''} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">

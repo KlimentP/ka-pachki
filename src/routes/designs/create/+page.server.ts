@@ -1,15 +1,26 @@
-/** @type {import('./$types').Actions} */
 import { fail, redirect } from '@sveltejs/kit';
 import { supabaseClient } from "$lib/supabaseClient";
 
 export async function load(){
-    // throw new Error('Not implemented');
-    const {data} =  await supabaseClient.from('employees').select('*')
-    return {employees: data ?? [],};
+    const {data: employees} =  await supabaseClient.from('employees').select('*')
+    const {data: colors} =  await supabaseClient.from('colors').select('*')
+    const newColors = colors?.map(color => ({id:color.name, name: color.name}) )
+    return {employees: employees ?? [],
+            colors: newColors ?? [],
+        };
+} 
+
+const validate = (submitData: any) => {
+    const errors: any = {};
+    if (submitData.color_scheme.length < 2) {
+        errors.color_scheme = 'Please select at least 2 or more colors';
+    }
+    return errors;
 }
 
+/** @type {import('./$types').Actions} */
 export const actions = {
-    default: async ({request, locals}) => {
+    default: async ({request, locals})  => {
         const formData = await request.formData();
         const submitData = {color_scheme: []};
         for (const [key, value] of formData.entries()) {
@@ -20,14 +31,13 @@ export const actions = {
                 submitData[key] = value;
             }
         }
-        if (submitData.color_scheme.length < 2) {
-            return fail(422, {color_scheme: submitData.color_scheme,
-                error: 'Please select at least 2 or more colors'
-            });
+        const errors = validate(submitData);
+        if (Object.keys(errors).length > 0) {
+            return fail(422, {...submitData, errors});
         }
         const {error} = await locals.supabase.from('designs').insert([submitData]);
         if (error) {
-            return fail(422, {error});
+            return fail(422, {...submitData, errors: [error]});
         }
         throw(redirect(303, '/designs'))
     }

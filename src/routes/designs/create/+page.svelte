@@ -2,33 +2,18 @@
 	import AutoCompleteMulti from '$lib/components/AutoCompleteMulti.svelte';
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	import { fade } from 'svelte/transition';
-	import { capitalizeString } from '$lib/utils/generic';
+	import { capitalizeString, dbToAutocomplete } from '$lib/utils/generic';
 
 	export let form;
 	export let data;
+	let employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
+	let colorOptions: AutocompleteOption[] = dbToAutocomplete(data.colors);
 
-	let colorOptions: AutocompleteOption[] = [
-		{ value: 'red', label: 'Red' },
-		{ value: 'blue', label: 'Blue' },
-		{ value: 'green', label: 'Green' },
-		{ value: 'yellow', label: 'Yellow' },
-		{ value: 'orange', label: 'Orange' },
-		{ value: 'purple', label: 'Purple' },
-		{ value: 'pink', label: 'Pink' },
-		{ value: 'brown', label: 'Brown' },
-		{ value: 'black', label: 'Black' },
-		{ value: 'white', label: 'White' },
-		{ value: 'gray', label: 'Gray' }
-	];
-	console.log(data)
-	let employeeOptions: AutocompleteOption[] = data.employees.map((employee) => {
-		return { value: employee.id, label: capitalizeString(employee.name) };}
-	)
 </script>
 
 <div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center max-sm:p-4">
 	<h2 class="mb-2">Create Design</h2>
-	{#if form?.error}
+	{#if form?.errors}
 		<aside
 			transition:fade|local={{ duration: 500 }}
 			class="alert variant-filled-error w-full max-w-lg"
@@ -36,7 +21,9 @@
 			<!-- Message -->
 			<div class="alert-message">
 				<h3>Error</h3>
-				<p>{JSON.stringify(form.error)}</p>
+				{#each Object.entries(form.errors) as [key, value]}
+					<p>{capitalizeString(key)}: {value}</p>
+				{/each}
 			</div>
 		</aside>
 	{/if}
@@ -57,7 +44,7 @@
 				>
 					Design Name
 				</label>
-				<input class="input" name="name" type="text" placeholder="Design Name" />
+				<input class="input" name="name" type="text" placeholder="Design Name" value={form?.name ?? ''} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -68,7 +55,7 @@
 				>
 					Color Scheme
 				</label>
-				<AutoCompleteMulti options={colorOptions} formName="color_scheme"/>
+				<AutoCompleteMulti options={colorOptions} formName="color_scheme" inputChipList={form?.color_scheme ?? []} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-6">
@@ -79,7 +66,7 @@
 				>
 					Material
 				</label>
-				<select class="select" name="material" size="4" value="lid">
+				<select class="select" name="material" size="4" value={form?.material ?? "lid"}>
 					<option value="lid">Lid</option>
 					<option value="label">Label</option>
 					<option value="butter">Butter</option>
@@ -95,7 +82,7 @@
 				>
 					Preferred Employee
 				</label>
-				<select class="select" name="preferred_employee" size="4" value="Lid">
+				<select class="select" name="preferred_employee" size="4" value={form?.preferred_employee ?? ""}>
 					{#each employeeOptions as employee}
 						<option value={employee.value}>{employee.label}</option>
 					{/each}
