@@ -42,7 +42,7 @@ export const actions = {
             if (error) {
                 return setError(form, null, error.message);
             }
-            return message(form, 'order updated!');
+            return message(form, 'Order updated!');
         }
         }
     };
