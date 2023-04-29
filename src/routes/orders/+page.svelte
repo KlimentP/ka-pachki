@@ -8,7 +8,7 @@
 	import StatusUpdate from '$lib/components/StatusUpdate.svelte';
 	export let data: PageData;
 	let { tableData } = data;
-	let selectedOrderId = '';
+	let selectedOrder = {};
 	// let filter = '';
 	// let filteredData = tableData;
 	const keysToFilter = [
@@ -97,12 +97,12 @@
 											slot="button"
 											on:click={() =>
 												{	
-													selectedOrderId = item.order_id;
+													selectedOrder = item;
 
 													modalStore.trigger({
 													type: 'component',
 													component: 'modalStatusUpdate',
-													meta: {selectedOrderId, }
+													meta: {selectedOrder, }
 												})}}
 											class=""
 										>
