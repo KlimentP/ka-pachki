@@ -5,7 +5,9 @@
 	import type { ModalComponent } from '@skeletonlabs/skeleton';
 	import ComboBox from '$lib/components/ComboBox.svelte';
 	import TooltipButton from '$lib/components/TooltipButton.svelte';
-	import StatusUpdate from '$lib/components/StatusUpdate.svelte';
+	import StatusUpdate from '$lib/components/ActionForms/StatusUpdate.svelte';
+	import UrgencyUpdate from '$lib/components/ActionForms/UrgencyUpdate.svelte';
+
 	export let data: PageData;
 	let { tableData } = data;
 	let selectedOrder = {};
@@ -23,6 +25,7 @@
 		'design_name',
 		'assigned_employee',
 		'preferred_employee',
+		'urgent',
 		'order_id'
 	];
 
@@ -36,7 +39,8 @@
 	}
 
 	const modalComponentRegistry: Record<string, ModalComponent> = {
-		modalStatusUpdate: { ref: StatusUpdate }
+		modalStatusUpdate: { ref: StatusUpdate, props: { action: '?/updateStatus' } },
+		modalUrgencyUpdate: { ref: UrgencyUpdate, props: { action: '?/updateUrgency' } }
 	};
 
 	const filteredData = tableData.map((obj) => filterObjectByKeys(obj, keysToFilter));
@@ -64,7 +68,7 @@
 <Modal components={modalComponentRegistry} />
 <div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center">
 	<!-- <input type="text" placeholder="Filter" bind:value={filter} on:input={handleFilterChange} /> -->
-	<div class="table-container border-primary-400 h-screen overflow-auto">
+	<div class="table-container border-primary-400 overflow-auto">
 		<table class="table table-comfortable table-auto bg-primary-200 text-slate-800">
 			<thead class="text-primary-400 !bg-slate-900">
 				<tr>
@@ -95,15 +99,15 @@
 										<button
 											type="button"
 											slot="button"
-											on:click={() =>
-												{	
-													selectedOrder = item;
+											on:click={() => {
+												selectedOrder = item;
 
-													modalStore.trigger({
+												modalStore.trigger({
 													type: 'component',
 													component: 'modalStatusUpdate',
-													meta: {selectedOrder, }
-												})}}
+													meta: { selectedOrder, field: 'Status' }
+												});
+											}}
 											class=""
 										>
 											<Icon
@@ -120,7 +124,16 @@
 										</div></TooltipButton
 									>
 									<TooltipButton target="status-urgency">
-										<button slot="button" on:click={() => console.log(item.order_id)} class="">
+										<button slot="button" 											on:click={() => {
+											selectedOrder = item;
+
+											modalStore.trigger({
+												type: 'component',
+												component: 'modalUrgencyUpdate',
+												meta: { selectedOrder, field: 'Urgent Status' }
+											});
+										}}
+										class="">
 											<Icon
 												class="hover:text-primary-500"
 												height="24"
