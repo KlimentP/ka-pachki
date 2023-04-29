@@ -1,22 +1,43 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import type { PageData } from './$types';
-
+	import { Modal, modalStore } from '@skeletonlabs/skeleton';
+	import type { ModalComponent } from '@skeletonlabs/skeleton';
+	import ComboBox from '$lib/components/ComboBox.svelte';
+	import TooltipButton from '$lib/components/TooltipButton.svelte';
+	import StatusUpdate from '$lib/components/StatusUpdate.svelte';
 	export let data: PageData;
 	let { tableData } = data;
-
+	let selectedOrderId = '';
 	// let filter = '';
 	// let filteredData = tableData;
-	const keysToFilter = ["date_created",  "status", "customer_name", "quantity", "design_name", "material", "color_scheme", "deadline", "design_name", "assigned_employee", "preferred_employee", "order_id",];
+	const keysToFilter = [
+		'date_created',
+		'status',
+		'customer_name',
+		'quantity',
+		'design_name',
+		'material',
+		'color_scheme',
+		'deadline',
+		'design_name',
+		'assigned_employee',
+		'preferred_employee',
+		'order_id'
+	];
 
 	function filterObjectByKeys(obj, keys) {
-	return keys.reduce((result, key) => {
-		if (obj.hasOwnProperty(key)) {
-		result[key] = obj[key];
-		}
-		return result;
-	}, {});
+		return keys.reduce((result, key) => {
+			if (obj.hasOwnProperty(key)) {
+				result[key] = obj[key];
+			}
+			return result;
+		}, {});
 	}
+
+	const modalComponentRegistry: Record<string, ModalComponent> = {
+		modalStatusUpdate: { ref: StatusUpdate }
+	};
 
 	const filteredData = tableData.map((obj) => filterObjectByKeys(obj, keysToFilter));
 	const headers = Object.keys(filteredData[0] || {});
@@ -40,35 +61,126 @@
 	// }
 </script>
 
+<Modal components={modalComponentRegistry} />
 <div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center">
 	<!-- <input type="text" placeholder="Filter" bind:value={filter} on:input={handleFilterChange} /> -->
-	<div class="table-container hover:border-2 border-primary-400 ">
-		<table class="table table-comfortable table-hover table-auto bg-primary-200 text-slate-800">
+	<div class="table-container border-primary-400 h-screen overflow-auto">
+		<table class="table table-comfortable table-auto bg-primary-200 text-slate-800">
 			<thead class="text-primary-400 !bg-slate-900">
 				<tr>
 					<!-- Add table headers for each field here -->
 					<th>Actions</th>
 					{#each headers as header}
-						<th >{header}</th>
+						<th>{header}</th>
 					{/each}
 				</tr>
 			</thead>
 			<tbody>
 				{#each filteredData as item, index}
 					<tr>
-						<td>
-							<button on:click={() => console.log(item.order_id)}>
-							<Icon  height=24 icon="carbon:task-complete" />
-							</button>
-							<button on:click={() => console.log(item.order_id)}>
-								<Icon class="text-red-500" height=24 icon="material-symbols:delete-forever-sharp" />
-							</button>
-							<button on:click={() => console.log(item.order_id)}>
-								<Icon height=24 icon="fluent:alert-urgent-16-filled" />
-							</button>
+						<td class="">
+							<ComboBox listBoxStyles="" comboboxValue={item.order_id} closeQuery="">
+								<Icon
+									class="text-slate-900"
+									slot="button"
+									height="24"
+									icon="ic:baseline-more-horiz"
+								/>
+								<div
+									class="flex flex-row gap-2 bg-slate-200 h-24 p-4 rounded-lg border-2
+								align-middle mx-auto justify-center items-center shadow-lg"
+									slot="listItems"
+								>
+									<TooltipButton target="status-hover">
+										<button
+											type="button"
+											slot="button"
+											on:click={() =>
+												{	
+													selectedOrderId = item.order_id;
 
-							<!-- <button on:click={() => handleEdit(index)}>Edit</button>
-							<button on:click={() => handleDelete(index)}>Delete</button> -->
+													modalStore.trigger({
+													type: 'component',
+													component: 'modalStatusUpdate',
+													meta: {selectedOrderId, }
+												})}}
+											class=""
+										>
+											<Icon
+												class="hover:text-primary-500"
+												height="24"
+												icon="carbon:task-complete"
+											/>
+										</button>
+										<div
+											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
+											slot="tooltip"
+										>
+											Update Status
+										</div></TooltipButton
+									>
+									<TooltipButton target="status-urgency">
+										<button slot="button" on:click={() => console.log(item.order_id)} class="">
+											<Icon
+												class="hover:text-primary-500"
+												height="24"
+												icon="fluent:alert-urgent-16-regular"
+											/>
+										</button>
+										<div
+											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
+											slot="tooltip"
+										>
+											Change Urgency
+										</div>
+									</TooltipButton>
+									<TooltipButton target="assign-employee-hover">
+										<button slot="button" on:click={() => console.log(item.order_id)} class="">
+											<Icon
+												class="hover:text-primary-500"
+												height="24"
+												icon="clarity:assign-user-line"
+											/>
+										</button>
+										<div
+											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
+											slot="tooltip"
+										>
+											Assign to Specific Employee
+										</div>
+									</TooltipButton>
+									<TooltipButton target="produced-units-hover">
+										<button slot="button" on:click={() => console.log(item.order_id)} class="">
+											<Icon
+												class="hover:text-primary-500"
+												height="24"
+												icon="fluent-mdl2:quantity"
+											/>
+										</button>
+										<div
+											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
+											slot="tooltip"
+										>
+											Update Produced Units
+										</div>
+									</TooltipButton>
+									<TooltipButton target="delete-hover">
+										<button slot="button" on:click={() => console.log(item.order_id)}>
+											<Icon
+												class="hover:text-red-500 "
+												height="24"
+												icon="material-symbols:delete-outline-sharp"
+											/>
+										</button>
+										<div
+											class="bg-slate-200 shadow-lg text-red-500 p-4 text-lg rounded-lg w-48"
+											slot="tooltip"
+										>
+											Delete Order
+										</div>
+									</TooltipButton>
+								</div>
+							</ComboBox>
 						</td>
 						{#each Object.values(item) as value}
 							<td>{value || ''}</td>
