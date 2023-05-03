@@ -4,6 +4,6 @@ import { supabaseClient } from "$lib/supabaseClient";
 export async function load() {
     const {data} = await supabaseClient
     .from('designs')
-    .select()
+    .select('*, employees (name)' )
     return {tableData: data ?? [],};
 }
