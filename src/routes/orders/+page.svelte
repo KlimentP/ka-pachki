@@ -1,15 +1,19 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import type { PageData } from './$types';
-	import { Modal, modalStore } from '@skeletonlabs/skeleton';
+	import { Modal, modalStore, type AutocompleteOption } from '@skeletonlabs/skeleton';
 	import type { ModalComponent } from '@skeletonlabs/skeleton';
 	import ComboBox from '$lib/components/ComboBox.svelte';
 	import TooltipButton from '$lib/components/TooltipButton.svelte';
 	import StatusUpdate from '$lib/components/ActionForms/StatusUpdate.svelte';
 	import UrgencyUpdate from '$lib/components/ActionForms/UrgencyUpdate.svelte';
+	import AssignEmployee from '$lib/components/ActionForms/AssignEmployee.svelte';
+	import DeleteItem from '$lib/components/ActionForms/DeleteItem.svelte';
+	import UpdateUnitsProduced from '$lib/components/ActionForms/UpdateUnitsProduced.svelte';
+	import { dbToAutocomplete } from '$lib/utils/generic';
 
 	export let data: PageData;
-	let { tableData } = data;
+	let { tableData, employees } = data;
 	let selectedOrder = {};
 	// let filter = '';
 	// let filteredData = tableData;
@@ -23,9 +27,9 @@
 		'color_scheme',
 		'deadline',
 		'design_name',
-		'assigned_employee',
-		'preferred_employee',
+		'employee',
 		'urgent',
+		'units_already_produced',
 		'order_id'
 	];
 
@@ -40,11 +44,18 @@
 
 	const modalComponentRegistry: Record<string, ModalComponent> = {
 		modalStatusUpdate: { ref: StatusUpdate, props: { action: '?/updateStatus' } },
-		modalUrgencyUpdate: { ref: UrgencyUpdate, props: { action: '?/updateUrgency' } }
+		modalUrgencyUpdate: { ref: UrgencyUpdate, props: { action: '?/updateUrgency' } },
+		modalAssignEmployee: { ref: AssignEmployee, props: { action: '?/assignEmployee' } },
+		modalUpdateUnitsProduced: {
+			ref: UpdateUnitsProduced,
+			props: { action: '?/updateUnitsProduced' }
+		},
+		modalDeleteItem: { ref: DeleteItem, props: { action: '?/deleteOrder' } }
 	};
 
 	const filteredData = tableData.map((obj) => filterObjectByKeys(obj, keysToFilter));
 	const headers = Object.keys(filteredData[0] || {});
+	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
 
 	// function handleFilterChange(event) {
 	// 	filter = event.target.value;
@@ -124,16 +135,19 @@
 										</div></TooltipButton
 									>
 									<TooltipButton target="status-urgency">
-										<button slot="button" 											on:click={() => {
-											selectedOrder = item;
+										<button
+											slot="button"
+											on:click={() => {
+												selectedOrder = item;
 
-											modalStore.trigger({
-												type: 'component',
-												component: 'modalUrgencyUpdate',
-												meta: { selectedOrder, field: 'Urgent Status' }
-											});
-										}}
-										class="">
+												modalStore.trigger({
+													type: 'component',
+													component: 'modalUrgencyUpdate',
+													meta: { selectedOrder, field: 'Urgent Status' }
+												});
+											}}
+											class=""
+										>
 											<Icon
 												class="hover:text-primary-500"
 												height="24"
@@ -148,7 +162,18 @@
 										</div>
 									</TooltipButton>
 									<TooltipButton target="assign-employee-hover">
-										<button slot="button" on:click={() => console.log(item.order_id)} class="">
+										<button
+											slot="button"
+											on:click={() => {
+												selectedOrder = item;
+
+												modalStore.trigger({
+													type: 'component',
+													component: 'modalAssignEmployee',
+													meta: { selectedOrder, field: 'Employee Assignment', employeeOptions }
+												});
+											}}
+										>
 											<Icon
 												class="hover:text-primary-500"
 												height="24"
@@ -163,7 +188,17 @@
 										</div>
 									</TooltipButton>
 									<TooltipButton target="produced-units-hover">
-										<button slot="button" on:click={() => console.log(item.order_id)} class="">
+										<button
+											slot="button"
+											on:click={() => {
+												selectedOrder = item;
+												modalStore.trigger({
+													type: 'component',
+													component: 'modalUpdateUnitsProduced',
+													meta: { selectedOrder, field: 'Units Produced' }
+												});
+											}}
+										>
 											<Icon
 												class="hover:text-primary-500"
 												height="24"
@@ -178,7 +213,15 @@
 										</div>
 									</TooltipButton>
 									<TooltipButton target="delete-hover">
-										<button slot="button" on:click={() => console.log(item.order_id)}>
+										<button slot="button" 											on:click={() => {
+											selectedOrder = item;
+											modalStore.trigger({
+												type: 'component',
+												component: 'modalDeleteItem',
+												meta: { selectedOrder, field: 'Order', formType: 'Delete', }
+											});
+										}}
+										>
 											<Icon
 												class="hover:text-red-500 "
 												height="24"
