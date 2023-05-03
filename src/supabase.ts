@@ -132,7 +132,33 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      orders_full: {
+        Row: {
+          assigned_employee_id: number | null
+          closed_by: string | null
+          closed_by_email: string | null
+          color_scheme: string[] | null
+          created_by: string | null
+          created_by_email: string | null
+          customer_id: number | null
+          customer_name: string | null
+          date_closed: string | null
+          date_created: string | null
+          date_updated: string | null
+          deadline: string | null
+          design_id: number | null
+          design_name: string | null
+          duration_order: number | null
+          employee: string | null
+          material: string | null
+          notes: string | null
+          order_id: string | null
+          quantity: number | null
+          status: string | null
+          units_already_produced: number | null
+          urgent: boolean | null
+        }
+      }
     }
     Functions: {
       [_ in never]: never

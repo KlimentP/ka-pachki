@@ -135,11 +135,11 @@ export const ordersUpdateSchema = z.object({
 });
 
 export const ordersFullRowSchema = z.object({
-	assigned_employee_id: z.number().nullable(),
+	// assigned_employee_id: z.number().nullable(),
 	closed_by: z.string().nullable(),
 	closed_by_email: z.string().nullable(),
 	color_scheme: z.array(z.string()).nullable(),
-	creaated_by_email: z.string().nullable(),
+	created_by_email: z.string().nullable(),
 	created_by: z.string().nullable(),
 	customer_id: z.number().nullable(),
 	customer_name: z.string().nullable(),
@@ -153,7 +153,8 @@ export const ordersFullRowSchema = z.object({
 	material: z.string().nullable(),
 	notes: z.string().nullable(),
 	order_id: z.string().nullable(),
-	preferred_employee_id_name: z.string().nullable(),
+	employee: z.string(),
+	// preferred_employee_id_name: z.string().nullable(),
 	quantity: z.number().nullable(),
 	status: z.string().nullable(),
 	units_already_produced: z.number().nullable(),
