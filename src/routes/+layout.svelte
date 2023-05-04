@@ -52,17 +52,19 @@
 		<AppBar background="bg-slate-950">
 			<svelte:fragment slot="lead">
 				<div class="text-surface-900-50--token">
-					<a href="/" aria-label="Home Page" class="text-white"> 
-						<img class="h-12 " src="/fleks-ko-logo-medium.png" alt="Fleks Ko Logo"/>
+					<a href="/" aria-label="Home Page" class="text-white "> 
+						<img class="h-14 hover:border-b-2 border-orange-500 p-1" src="/fleks-ko-logo-medium.png" alt="Fleks Ko Logo"/>
 					 </a>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<div class="flex items-center gap-2">
 					{#if $page.data.session}
+					<a href="/planner" class="btn variant-ghost-secondary text-slate-300 hover:text-secondary-500">Planner</a>
+
 					<ComboBox comboboxValue={'Designs'} listItems={designDropdown} />
 					<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} />
-					<button type="button" class="btn text-slate-200 hover:text-primary-500"  on:click={signout}>Sign Out</button>
+					<button type="button" class="btn text-slate-300 hover:text-primary-500"  on:click={signout}>Sign Out</button>
 					{:else}
 					<a href="/login" class="btn text-slate-300 hover:text-primary-500">Sign In</a>
 					{/if}
