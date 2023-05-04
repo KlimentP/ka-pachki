@@ -27,16 +27,16 @@
 	<slot name="listItems">
 		<ListBox rounded="rounded-none">
 			{#each listItems as item}
-				<a href={item.url}>
-					<ListBoxItem
-						class="bg-slate-950 text-slate-300 hover:text-primary-500"
-						bind:group={comboboxValue}
-						value={comboboxValue}
-						name={item.label}
-					>
+			<ListBoxItem
+			class="bg-slate-950 "
+			bind:group={comboboxValue}
+			value={comboboxValue}
+			name={item.label}
+			>
+			<a class="flex text-left w-full  text-slate-300 hover:text-primary-500 hover:underline-offset-8 hover:underline"  href={item.url}>
 						{item.label}
+					</a>
 					</ListBoxItem>
-				</a>
 			{/each}
 		</ListBox>
 	</slot>
