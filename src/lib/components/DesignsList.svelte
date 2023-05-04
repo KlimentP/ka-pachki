@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Database } from '../../supabase';
 	import { capitalizeString } from '$lib/utils/generic';
-	export let items;
+	export let items: any;
 	// Database['public']['Tables']['designs']['Row'][] = [];
 
 // 	const colorVariants = {

@@ -2,9 +2,9 @@ import { supabaseClient } from '$lib/supabaseClient';
 
 export async function load() {
 	const { data } = await supabaseClient.from('orders_full').select('*');
-  const employees = await supabaseClient.from('employees').select('name,id')  
+  const {data: employees} = await supabaseClient.from('employees').select('name,id')  
 	return { tableData: data ?? [],
-           employees: employees.data ?? [] };
+           employees: employees ?? [] };
 }
 
 export const actions = {

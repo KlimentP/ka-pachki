@@ -55,7 +55,7 @@
 
 	const filteredData = tableData.map((obj) => filterObjectByKeys(obj, keysToFilter));
 	const headers = Object.keys(filteredData[0] || {});
-	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
+	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(employees);
 
 	// function handleFilterChange(event) {
 	// 	filter = event.target.value;
