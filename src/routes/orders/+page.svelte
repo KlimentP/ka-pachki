@@ -30,7 +30,7 @@
 		'employee',
 		'urgent',
 		'units_already_produced',
-		'order_id'
+		'id'
 	];
 
 	function filterObjectByKeys(obj, keys) {
@@ -94,7 +94,7 @@
 				{#each filteredData as item, index}
 					<tr>
 						<td class="">
-							<ComboBox listBoxStyles="" comboboxValue={item.order_id} closeQuery="">
+							<ComboBox listBoxStyles="" comboboxValue={item.id} closeQuery="">
 								<Icon
 									class="text-slate-900"
 									slot="button"
@@ -213,14 +213,17 @@
 										</div>
 									</TooltipButton>
 									<TooltipButton target="delete-hover">
-										<button slot="button" 											on:click={() => {
-											selectedOrder = item;
-											modalStore.trigger({
-												type: 'component',
-												component: 'modalDeleteItem',
-												meta: { selectedOrder, field: 'Order', formType: 'Delete', }
-											});
-										}}
+										<button
+											slot="button"
+											on:click={() => {
+												selectedOrder = item;
+												modalStore.trigger({
+													type: 'component',
+													component: 'modalDeleteItem',
+													meta: { selectedItem: selectedOrder, field: 'Order', formType: 'Delete', 
+												title: (selectedOrder?.customer_name || '') + ' - ' + (selectedOrder?.design_name || '') }
+												});
+											}}
 										>
 											<Icon
 												class="hover:text-red-500 "
