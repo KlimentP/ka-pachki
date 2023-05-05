@@ -77,25 +77,25 @@
 					<div class="flex items-center gap-2 text-2xl text-slate-800 p-2">
 						{key}
 						<span><Icon icon={machineIcons[key]} /></span>
-						{#if loading}
-							<div class="placeholder animate-pulse rounded-lg h-[600px] w-96" />
-						{:else}
-							<div class="w-full overflow-auto p-4">
-								<Timeline>
-									{#each value as v, index}
-										<TimelineItem
-											title={v.design_name ?? ''}
-											timestamp={v.deadline ?? 'Unknown Deadline'}
-											badgeText={v.quantity?.toString() ?? 'Unknown Quantity'}
-											description={v.material + ': ' + v.color_scheme}
-										>
-											<div slot="icon">{index + 1}</div>
-										</TimelineItem>
-									{/each}
-								</Timeline>
-							</div>
-						{/if}
 					</div>
+					{#if loading}
+						<div class="placeholder animate-pulse rounded-lg h-[600px] w-96" />
+					{:else}
+						<div class="w-full overflow-auto p-4">
+							<Timeline>
+								{#each value as v, index}
+									<TimelineItem
+										title={v.design_name ?? ''}
+										timestamp={v.deadline ?? 'Unknown Deadline'}
+										badgeText={v.quantity?.toString() ?? 'Unknown Quantity'}
+										description={v.material + ': ' + v.color_scheme}
+									>
+										<div slot="icon">{index + 1}</div>
+									</TimelineItem>
+								{/each}
+							</Timeline>
+						</div>
+					{/if}
 				</div>
 			{/each}
 		{/if}
