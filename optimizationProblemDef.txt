@@ -1,0 +1,15 @@
+1. We have 3 printing machines (lets call them butter, label, embossed_lid), each one can print the generic lid, but also each one can print 
+one type of product that only it can handle - butter packaing (butter for short), general labels (label for short),
+embossed lid (embossed_lid for short), i.e. a lid can go to any of the three machines, but a butter can go only to the butter machine
+
+2. We have a backlog of orders with corresponding designs. A design is combination of material + color scheme that is 3 to 6 colors. 
+
+3. When doing two orders on the same machine on after another, the more colors that differ between the color schemes of the two orders, the more time is wasted for changing printing colors. Therefore, we want to group orders together where the fewest changes of colors are necessary. Additionally, it would be good to bundle same materials together if possible. 
+
+4. Each order has a deadline, we do not want be late, so if an order is due soon, it should have some priority. 
+
+5. Each machine is operated by a specific employee. Some designs are made only by a specific employee, so they need to go his machine. Employee-machine assignment doesnt change in normal circumstances. 
+
+6. We have 8 hours in the day (+- 15 minute tolerance) and an order can take more than the entire day and respectively, an order can be already complete to an extend. 
+
+Given these constraints and a backlog of orders, we need to design an optimization algorithm. 
