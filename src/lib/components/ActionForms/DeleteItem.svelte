@@ -1,29 +1,34 @@
 <script lang="ts">
 	import { modalStore } from '@skeletonlabs/skeleton';
-	const { selectedOrder, field, formType } = $modalStore[0].meta;
+	const { selectedItem, field, title } = $modalStore[0].meta;
 	import Icon from '@iconify/svelte';
 
 	export let action: string;
+	export let error: string; 
+
 </script>
 
 <div
 	class="container h-[50%] w-full max-w-3xl mx-auto flex flex-col gap-4 justify-center items-center bg-surface-200 rounded-lg"
 >
-	<h2 class="mb-2">{formType || 'Update'} {field}</h2>
+	<!-- {#if error}
+		<div class="text-red-700 text-xl">{error}</div>
+	{/if} -->
+	<h2 class="mb-2">Delete {field}</h2>
 	<div class="text-lg text-slate-800">
-		{selectedOrder.customer_name || ''} - {selectedOrder.design_name}
+		{title}
 	</div>
 	<div class="text-xl">Are you sure you want to proceed?</div>
-	<form id="delete-form" class="w-full max-w-lg" method="POST" {action}>
+	<form  id="delete-form" class="w-full max-w-lg" method="POST" {action}>
 		<slot />
-		<input type="hidden" name="order_id" value={selectedOrder.order_id} />
+		<input type="hidden" name="id" value={selectedItem.id} />
 	</form>
 	<div class="flex flex-row gap-2 justify-center">
 		<div>
 			<button
 				class="bg-red-700 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
 				type="submit"
-                form="delete-form"
+				form="delete-form"
 			>
 				Delete
 			</button>
