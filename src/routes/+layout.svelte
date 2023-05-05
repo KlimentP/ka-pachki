@@ -49,24 +49,24 @@
 <AppShell>
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
-		<AppBar background="bg-slate-950">
+		<AppBar slotDefault="w-0" padding="max-sm:py-2 p-2" gap="gap-1 md:gap-4" background="bg-slate-950">
 			<svelte:fragment slot="lead">
 				<div class="text-surface-900-50--token">
 					<a href="/" aria-label="Home Page" class="text-white "> 
-						<img class="h-14 hover:border-b-2 border-orange-500 p-1" src="/fleks-ko-logo-medium.png" alt="Fleks Ko Logo"/>
+						<img class="h-8 md:h-14 hover:border-b-2 border-orange-500 p-1" src="/fleks-ko-logo-medium.png" alt="Fleks Ko Logo"/>
 					 </a>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-1 md:gap-2">
 					{#if $page.data.session}
-					<a href="/planner" class="btn variant-ghost-secondary text-slate-300 hover:text-secondary-500">Planner</a>
+					<a href="/planner" class="btn btn-sm variant-ghost-secondary text-slate-300 hover:text-secondary-500">Planner</a>
 
 					<ComboBox comboboxValue={'Designs'} listItems={designDropdown} />
 					<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} />
-					<button type="button" class="btn text-slate-300 hover:text-primary-500"  on:click={signout}>Sign Out</button>
+					<button type="button" class="btn btn-sm text-slate-300 hover:text-primary-500"  on:click={signout}>Sign Out</button>
 					{:else}
-					<a href="/login" class="btn text-slate-300 hover:text-primary-500">Sign In</a>
+					<a href="/login" class="btn btn-sm text-slate-300 hover:text-primary-500">Sign In</a>
 					{/if}
 					<!-- <LightSwitch /> -->
 				</div></svelte:fragment

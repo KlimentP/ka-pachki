@@ -16,7 +16,7 @@
 </script>
 
 <button
-	class="btn variant-ghost-primary text-slate-300 hover:text-primary-500"
+	class="btn btn-sm variant-ghost-primary text-slate-300 hover:text-primary-500"
 	use:popup={popupCombobox}
 >
 	<slot name="button">
