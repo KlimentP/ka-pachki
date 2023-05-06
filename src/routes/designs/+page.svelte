@@ -8,7 +8,6 @@
 	export let form;
 	let {tableData} = data;
 	if (form?.error) {
-		console.log('triggering toast')
 		toastStore.trigger({
 					message: `Error: ${form.error}`,
 					background: 'bg-red-500',

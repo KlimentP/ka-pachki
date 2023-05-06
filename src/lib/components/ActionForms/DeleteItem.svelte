@@ -4,7 +4,6 @@
 	import Icon from '@iconify/svelte';
 
 	export let action: string;
-	export let error: string; 
 
 </script>
 

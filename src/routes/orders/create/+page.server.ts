@@ -1,14 +1,13 @@
 /** @type {import('./$types').Actions} */
 import { fail } from '@sveltejs/kit';
-import { supabaseClient } from '$lib/supabaseClient';
 import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import { ordersInsertSchema } from '../../../schemas';
 import { removeNullValues } from '$lib/utils/generic';
 
-export async function load() {
-	const { data: employees } = await supabaseClient.from('employees').select('*');
-	const { data: designs } = await supabaseClient.from('designs').select('name,id');
-	const { data: customers } = await supabaseClient.from('customers').select('name,id');
+export async function load({locals }) {
+	const { data: employees } = await locals.supabase.from('employees').select('*');
+	const { data: designs } = await locals.supabase.from('designs').select('name,id');
+	const { data: customers } = await locals.supabase.from('customers').select('name,id');
 	const form = superValidate(ordersInsertSchema);
 
 	return { employees: employees ?? [], designs: designs ?? [], customers: customers ?? [], form };

@@ -1,10 +1,9 @@
-import { supabaseClient } from "$lib/supabaseClient";
-
-// import { selectAll } from "$lib/utils/supabase/selectAll";
-export async function load() {
-    const {data} = await supabaseClient
+export async function load({ locals }) {
+	const { supabase } = locals;
+    const {data} = await supabase
     .from('designs')
     .select('*, employees (name)' )
+console.log(await supabase.auth.getUser())
     return {tableData: data ?? [],};
 }
 

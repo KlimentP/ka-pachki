@@ -1,12 +1,12 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { supabaseClient } from '$lib/supabaseClient';
 import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import { designsInsertSchema } from '../../../schemas';
 import { removeNullValues } from '$lib/utils/generic';
 
-export async function load() {
-	const { data: employees } = await supabaseClient.from('employees').select('*');
-	const { data: colors } = await supabaseClient.from('colors').select('*');
+export async function load({locals}) {
+
+	const { data: employees } = await locals.supabase.from('employees').select('*');
+	const { data: colors } = await locals.supabase.from('colors').select('*');
 	const newColors = colors?.map((color) => ({ id: color.name, name: color.name }));
 	const form = superValidate(designsInsertSchema);
 	return { employees: employees ?? [], colors: newColors ?? [], form };
