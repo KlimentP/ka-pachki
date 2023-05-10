@@ -69,7 +69,7 @@ class Machine:
     def add_order(self, order) -> None:
         self.orders.append(order)
         if len(self.orders) > 1:
-            switch_difference = order.compute_switch_difference(self.orders[-2])
+            switch_difference = self.compute_switch_difference(self.orders[-2], order)
             self.switch_cost_minutes += switch_difference
         elif order.material == "butter":
             self.available_minutes -= 20

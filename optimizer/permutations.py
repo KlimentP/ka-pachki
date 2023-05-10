@@ -4,25 +4,22 @@ from functools import partial
 
 from multiprocessing import Pool
 
-# import sys
-# sys.path.append('/home/kliment/ka-pachki/adhoc/optimizer.py')
-from optimizer import Employee, Machine, Order, Factory, mock_order
+from factory import Employee, Machine, Order, Factory, mock_order
 
 
-
-#TODO think about this combo of material and employee
+# TODO think about this combo of material and employee
 def conditional_perm(
     p: list[Order], specific_materials=("labels", "butter", "embossed_lids")
 ) -> bool:  # sourcery skip: use-named-expression
     sum_mins = sum(x.minutes_length for x in p)
 
-    if sum_mins < 400 or sum_mins > 495:
+    if sum_mins < 200 or sum_mins > 495:
         return False
     # employees = [x.employee for x in p if x is not None]
     # if employees:
     #     employee_materials = {
     #         x.employee.machine for x in p if x.employee.machine in specific_materials # type: ignore
-    #     }  
+    #     }
 
     if len(p) == 1:
         return True
@@ -155,7 +152,13 @@ def narrow_down_orders(orders: list[Order]) -> list[Order]:
 
 def main() -> PermOptimizer:
     # Define the lengths of permutations to generate
-    lengths = [1, 2, 3, 4, 5,]
+    lengths = [
+        1,
+        2,
+        3,
+        4,
+        5,
+    ]
     employees = {
         "Bobi": Employee("1", "Bobi", "labels"),
         "Sasho": Employee("2", "Sasho", "butter"),
@@ -176,6 +179,43 @@ def main() -> PermOptimizer:
     opt = PermOptimizer(factory, perm_by_machine)
     opt.fit_perms_factory()
     return opt
+
+
+def optimize_orders(
+    machine_names: list[str] | None = None, orders: list[Order] | None = None
+):
+    if machine_names is None:
+        machine_names = ["butter", "labels", "embossed_lids"]
+    lengths = [
+        1,
+        2,
+        3,
+        4,
+        5,
+    ]
+    if orders is None:
+        employees = {
+            "Bobi": Employee("1", "Bobi", "labels"),
+            "Sasho": Employee("2", "Sasho", "butter"),
+            "Valter": Employee("3", "Valter", "embossed_lids"),
+        }
+
+        orders = [mock_order(i, employees) for i in range(12)]
+
+    filtered_orders = narrow_down_orders(orders)
+    perms = get_all_perms(filtered_orders, lengths, parallel=True)
+    perm_by_machine = sort_perms_by_machine(perms, machine_names)
+    # Define the batch size for permutations of length 6
+    machines_list = [Machine(x, [], ["lids", x]) for x in machine_names]
+    machines = {x.name: x for x in machines_list}
+    factory = Factory(machines)
+
+    opt = PermOptimizer(factory, perm_by_machine)
+    opt.fit_perms_factory()
+    return {
+        "orders": opt.factory.scheduled_orders,
+        "status": opt.factory.status,
+    }
 
 
 # if __name__ == "__main__":
