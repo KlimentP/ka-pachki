@@ -4,16 +4,26 @@ from functools import partial
 
 from multiprocessing import Pool
 
+# import sys
+# sys.path.append('/home/kliment/ka-pachki/adhoc/optimizer.py')
+from optimizer import Employee, Machine, Order, Factory, mock_order
 
-from adhoc.optimizer import Employee, Machine, Order, Factory, mock_order
 
 
+#TODO think about this combo of material and employee
 def conditional_perm(
     p: list[Order], specific_materials=("labels", "butter", "embossed_lids")
-) -> bool:
+) -> bool:  # sourcery skip: use-named-expression
     sum_mins = sum(x.minutes_length for x in p)
-    if sum_mins < 3 * 60 or sum_mins > 485:
+
+    if sum_mins < 400 or sum_mins > 495:
         return False
+    # employees = [x.employee for x in p if x is not None]
+    # if employees:
+    #     employee_materials = {
+    #         x.employee.machine for x in p if x.employee.machine in specific_materials # type: ignore
+    #     }  
+
     if len(p) == 1:
         return True
     spec_materials = {o.material for o in p if o.material in specific_materials}
@@ -48,15 +58,17 @@ class PermOptimizer:
         self,
         machine_name: str,
     ):
-        print(f"checking {machine_name}")
         best_fit = {}
         machine = self.factory.machines[machine_name]
         min_idle_time = self.min_idle_time
         # factory.clear_orders()
         perms = self.perms[machine_name]
-        print(f"checking {len(perms)} options")
+        print(f"checking {len(perms)} options for {machine_name}")
         for perm in perms:
-            self.factory.add_multiple_orders(perm, machine_name)
+            try:
+                self.factory.add_multiple_orders(perm, machine_name)
+            except Exception:
+                continue
             if machine.idle_time < min_idle_time:
                 min_idle_time = machine.idle_time
                 best_fit = {
@@ -65,15 +77,17 @@ class PermOptimizer:
                     "available_minutes": machine.available_minutes,
                     "perm": perm,
                 }
+
             self.factory.clear_orders([machine_name])
         # re-add once we know the best perm
         if best_fit:
             self.factory.add_multiple_orders(
-                best_fit["perm"], machine_name, True  # type: ignore
+                best_fit["perm"], machine_name  # type: ignore
             )
             self.factory.update_status()
         else:
             print(f"No best fit found for {machine_name} ")
+        print(machine.idle_time)
 
     def fit_perms_factory(self) -> None:
         min_idle_time: float = self.min_idle_time * len(self.factory.machines)
@@ -131,17 +145,27 @@ def sort_perms_by_machine(
     return perms_by_machine
 
 
+def narrow_down_orders(orders: list[Order]) -> list[Order]:
+    butters = [x for x in orders if x.material == "butter"]
+    butters_duration = sum(x.minutes_length for x in butters)
+    if butters_duration < 350:
+        return [x for x in orders if x.material != "butter"]
+    return orders
+
+
 def main() -> PermOptimizer:
     # Define the lengths of permutations to generate
-    lengths = [1, 2, 3, 4, 5]
+    lengths = [1, 2, 3, 4, 5,]
     employees = {
-        "Nasko": Employee("1", "Ivan", "labels"),
-        "Ivan": Employee("2", "Nasko", "butter"),
-        "Dragan": Employee("3", "Dragan", "embossed_lids"),
+        "Bobi": Employee("1", "Bobi", "labels"),
+        "Sasho": Employee("2", "Sasho", "butter"),
+        "Valter": Employee("3", "Valter", "embossed_lids"),
     }
 
     orders = [mock_order(i, employees) for i in range(12)]
-    perms = get_all_perms(orders, lengths, parallel=True)
+    filtered_orders = narrow_down_orders(orders)
+
+    perms = get_all_perms(filtered_orders, lengths, parallel=True)
     machine_names = ["butter", "labels", "embossed_lids"]
     perm_by_machine = sort_perms_by_machine(perms, machine_names)
     # Define the batch size for permutations of length 6
@@ -154,9 +178,9 @@ def main() -> PermOptimizer:
     return opt
 
 
-if __name__ == "__main__":
-    opt = main()
-    # print(opt.best_fit)
-    print("opt time", opt.optimized_idle_time)
-    print("status",  opt.factory.status)
-    print("orders", opt.factory.scheduled_orders)
+# if __name__ == "__main__":
+#     opt = main()
+#     # print(opt.best_fit)
+#     print("opt time", opt.optimized_idle_time)
+#     print("status", opt.factory.status)
+#     print("orders", opt.factory.scheduled_orders)
