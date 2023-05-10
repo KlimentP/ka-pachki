@@ -36,3 +36,14 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+
+## Deployment on vercel
+
+You need to specify the env vars: 
+```bash
+PUBLIC_SUPABASE_URL
+PUBLIC_SUPABASE_ANON_KEY
+```
+To skip unnecessary builds, add optimizer dir to ```.vercelignore```
+And also in settings/git, add the following: ```git diff --quiet HEAD^ HEAD ./ ':(exclude)optimizer'```
