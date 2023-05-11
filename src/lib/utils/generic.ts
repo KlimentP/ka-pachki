@@ -16,3 +16,15 @@ export const  removeNullValues = (obj: {[key: string]: any | null | undefined}) 
         return newObj;
       }, {});
   }
+
+  export const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: number) => {
+    let timeoutId: NodeJS.Timeout | null = null;
+  
+    return (...args: Parameters<F>): void => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => func(...args), waitFor);
+    };
+  };
+  
