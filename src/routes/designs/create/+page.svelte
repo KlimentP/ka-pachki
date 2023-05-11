@@ -79,7 +79,8 @@
 					<option value="lid">Lid</option>
 					<option value="label">Label</option>
 					<option value="butter">Butter</option>
-					<option value="mebossed_lid">Embossed Lid</option>
+					<option value="uv_butter">UV Butter</option>
+					<option value="embossed_lids">Embossed Lid</option>
 				</select>
 			</div>
 			{#if $errors.material}<span class="text-error-500">{$errors.material}</span>{/if}
