@@ -6,23 +6,23 @@
 	export let form: any;
 	export let options: AutocompleteOption[] =[];
     export let formName: string;
-	export let inputChipList = form[formName];
+	// export let inputChipList = form[formName];
 	function onInputChipSelect(event: any): void {
-		if (inputChipList.includes(event.detail.value) === false) {
-			inputChipList = [...inputChipList, event.detail.value];
+		if (form[formName].includes(event.detail.value) === false) {
+			form[formName] = [...form[formName], event.detail.value];
 			inputChip = '';
 		}
 	}
 </script>
 
-<InputChip bind:input={inputChip} bind:value={inputChipList} name={formName} data-invalid={form[formName]} />
+<InputChip bind:input={inputChip} bind:value={form[formName]} name={formName} data-invalid={form[formName]} />
 
 <div class="card w-full max-h-24 p-4 overflow-y-auto" >
 	<Autocomplete
 		class="max-h-24"
 		bind:input={inputChip}
 		{options}
-		denylist={inputChipList}
+		denylist={form[formName]}
 		on:selection={onInputChipSelect}
 	/>
 </div>
