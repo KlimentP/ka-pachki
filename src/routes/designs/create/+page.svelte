@@ -7,10 +7,18 @@
 
 	import { dbToAutocomplete } from '$lib/utils/generic';
 	export let data;
-	const { form, errors, constraints, enhance, delayed, message, empty } = superForm(data.form);
-	console.log($form);
-	console.log($errors);
+	let { form, errors, constraints, enhance, delayed, message, empty, reset } = superForm(data.form, {
+		onUpdated({ form }) {
+			// Need to do this because messages can't be preserved on redirect.
+			// sveltekit-flash-message fixes this issue:
+			// https://github.com/ciscoheat/sveltekit-flash-message
+			if (form.valid) {
+				reset({ keepMessage: true });
+			}
+		}
+	});
 	// export let form;
+
 	let employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
 	let colorOptions: AutocompleteOption[] = dbToAutocomplete(data.colors);
 </script>
@@ -116,15 +124,15 @@
 			</aside>
 		{/if}
 		{#if $message}
-		<aside
-			transition:fade|local={{ duration: 500 }}
-			class="alert"
-			class:variant-filled-success={$page.status < 400}
-			class:variant-filled-error={$page.status >= 400}
-		>
-			<h3>{$message}</h3>
-		</aside>
-	{/if}
+			<aside
+				transition:fade|local={{ duration: 500 }}
+				class="alert"
+				class:variant-filled-success={$page.status < 400}
+				class:variant-filled-error={$page.status >= 400}
+			>
+				<h3>{$message}</h3>
+			</aside>
+		{/if}
 		<div class="flex flex-wrap -mx-3 my-2">
 			<div class="w-full px-3">
 				<button

@@ -16,7 +16,6 @@ export async function load({locals }) {
 export const actions = {
 	default: async ({ request, locals }) => {
 		const form = await superValidate(request, ordersInsertSchema);
-		console.log(form);
 		if (!form.valid) return fail(400, { form });
 		let submitData = removeNullValues(form.data);
 		const session = await locals.getSession();

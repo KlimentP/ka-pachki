@@ -111,8 +111,8 @@ export const ordersInsertSchema = z.object({
 	id: z.string().optional(),
 	quantity: z.number().optional().nullable(),
 	status: z.string().optional().nullable().default('scheduled'),
-	units_already_produced: z.number().optional(),
-	urgent: z.boolean().optional()
+	units_already_produced: z.number().optional().default(0),
+	urgent: z.boolean().optional().default(false)
 });
 
 export const ordersUpdateSchema = z.object({
