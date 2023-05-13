@@ -106,7 +106,7 @@
 								align-middle mx-auto justify-center items-center shadow-lg"
 									slot="listItems"
 								>
-									<TooltipButton target="status-hover">
+									<TooltipButton target={`status-hover-${index}`}>
 										<button
 											type="button"
 											slot="button"
@@ -134,7 +134,7 @@
 											Update Status
 										</div></TooltipButton
 									>
-									<TooltipButton target="status-urgency">
+									<TooltipButton target={`urgency-hover-${index}`}>
 										<button
 											slot="button"
 											on:click={() => {
@@ -161,7 +161,7 @@
 											Change Urgency
 										</div>
 									</TooltipButton>
-									<TooltipButton target="assign-employee-hover">
+									<TooltipButton target={`assign_employee-hover-${index}`}>
 										<button
 											slot="button"
 											on:click={() => {
@@ -187,7 +187,7 @@
 											Assign to Specific Employee
 										</div>
 									</TooltipButton>
-									<TooltipButton target="produced-units-hover">
+									<TooltipButton target={`produced-units-hover-${index}`}>
 										<button
 											slot="button"
 											on:click={() => {
@@ -212,7 +212,7 @@
 											Update Produced Units
 										</div>
 									</TooltipButton>
-									<TooltipButton target="delete-hover">
+									<TooltipButton target={`delete-hover-${index}`}>
 										<button
 											slot="button"
 											on:click={() => {
