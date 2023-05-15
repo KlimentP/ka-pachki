@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { env } from '$env/dynamic/public';
 	import { dbToAutocomplete } from '$lib/utils/generic';
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	import Timeline from '$lib/components/Timeline/Timeline.svelte';
 	import TimelineItem from '$lib/components/Timeline/TimelineItem.svelte';
 	import Icon from '@iconify/svelte';
+	import { convertMinutesToHoursMinutes, capitalizeString } from '$lib/utils/generic';
+	import ColorScheme from '$lib/components/ColorScheme.svelte';
+	import Material from '$lib/components/Material.svelte';
 
 	export let data;
 	let loading = false;
@@ -19,15 +23,28 @@
 		Labels: 'quill:label',
 		Butter: 'fluent-emoji-high-contrast:butter'
 	};
-	const generatePlan = () => {
+
+	const generatePlan = async () => {
+		const authString = `${env.PUBLIC_OPTIMIZER_USER}:${env.PUBLIC_OPTIMIZER_PASSWORD}`;
+		const encodedAuthString = window.btoa(authString);
+
+		const headers = new Headers({
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${encodedAuthString}`
+		});
 		loading = true;
-		setTimeout(() => {
-			loading = false;
-		}, 500);
-		console.log(availableMachines);
+
+		const res = await fetch('http://127.0.0.1:8000/optimize', {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({ machines: availableMachines, orders })
+		});
+		loading = false;
+		const { machines: planMachines, orders: planOrders } = await res.json();
+
 		plan = {};
-		plan = availableMachines.reduce((acc: any, curr: string) => {
-			acc[curr] = orders;
+		plan = planMachines.reduce((acc: any, curr: string) => {
+			acc[curr] = planOrders;
 			return acc;
 		}, plan);
 	};
@@ -70,7 +87,7 @@
 			Generate Schedule
 		</button>
 	</div>
-	<section class="flex flex-wrap gap-8 justify-center">
+	<section class="flex flex-wrap gap-8 justify-center max-h-screen overflow-y-auto">
 		{#if Object.keys(plan).length > 0}
 			{#each Object.entries(plan) as [key, value]}
 				<div class="flex flex-col card gap-4 max-w-md p-4 max-sm:max-w-sm">
@@ -81,16 +98,23 @@
 					{#if loading}
 						<div class="placeholder animate-pulse rounded-lg h-[600px] w-96" />
 					{:else}
-						<div class="w-full overflow-auto p-4">
+						<div class="w-full p-4">
 							<Timeline>
 								{#each value as v, index}
 									<TimelineItem
 										title={v.design_name ?? ''}
-										timestamp={v.deadline ?? 'Unknown Deadline'}
-										badgeText={v.quantity?.toString() ?? 'Unknown Quantity'}
-										description={v.material + ': ' + v.color_scheme}
+										timestamp={v.deadline ?? 'No Deadline'}
+										badgeText={convertMinutesToHoursMinutes(v.minutes_length) ?? 'Unknown Quantity'}
+										description=""
 									>
 										<div slot="icon">{index + 1}</div>
+										<ColorScheme colors={v.color_scheme ?? []} />
+										<div class="flex flex-row gap-2">
+											<div class="text-lg text-slate-800 font-bold">Material:</div>
+											<div class="self-center">
+												<Material iconHeight="24" material={v.material} />
+											</div>
+										</div>
 									</TimelineItem>
 								{/each}
 							</Timeline>
