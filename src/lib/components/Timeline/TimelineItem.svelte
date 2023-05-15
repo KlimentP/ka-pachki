@@ -23,7 +23,7 @@
 	<!-- Timestamp -->
 	<time class="block mb-2">Due on {timestamp}</time>
 	<!-- Description -->
-	<p class="mb-4 opacity-75">{description}</p>
+	<p class="opacity-75">{description}</p>
 	<!-- Slot: Default -->
 	{#if $$slots.default}<div><slot /></div>{/if}
 </li>

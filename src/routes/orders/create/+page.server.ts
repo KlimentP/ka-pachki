@@ -4,8 +4,8 @@ import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import { ordersInsertSchema } from '../../../schemas';
 import { removeNullValues } from '$lib/utils/generic';
 
-export async function load({locals }) {
-	const { data: employees } = await locals.supabase.from('employees').select('*');
+export async function load({ locals }) {
+	const { data: employees } = await locals.supabase.from('employees').select('name, id');
 	const { data: designs } = await locals.supabase.from('designs').select('name,id');
 	const { data: customers } = await locals.supabase.from('customers').select('name,id');
 	const form = superValidate(ordersInsertSchema);
