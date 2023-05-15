@@ -28,3 +28,8 @@ export const  removeNullValues = (obj: {[key: string]: any | null | undefined}) 
     };
   };
   
+export function convertMinutesToHoursMinutes(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${hours} hrs :${remainingMinutes < 10 ? '0' : ''}${remainingMinutes} min`;
+}
