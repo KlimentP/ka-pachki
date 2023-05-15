@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import { designsInsertSchema } from '../../../schemas';
 import { removeNullValues } from '$lib/utils/generic';
