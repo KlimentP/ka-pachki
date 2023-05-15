@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ColorScheme from '$lib/components/ColorScheme.svelte';
+
 	import { Modal, modalStore } from '@skeletonlabs/skeleton';
 	import type { ModalComponent } from '@skeletonlabs/skeleton';
 	import DeleteItem from '$lib/components/ActionForms/DeleteItem.svelte';
@@ -54,16 +56,7 @@
 					</header>
 					<div class="p-4 flex flex-col gap-2 justify-start">
 						<section class="">
-							<div class="flex flex-wrap gap-2 py-4">
-								{#each item.color_scheme as color}
-									<div
-										style="border-color: {colorMap[color]}"
-										class="chip chip-hover rounded-xl text-slate-800 border-2 shadow-lg"
-									>
-										{color}
-									</div>
-								{/each}
-							</div>
+							<ColorScheme colors={item.color_scheme}/>
 							<div class="text-xl text-slate-800">Material: {capitalizeString(item.material)}</div>
 						</section>
 						{#if item?.employees?.name}
