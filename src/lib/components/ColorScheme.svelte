@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { colorMap } from '$lib/utils/colorMap';
-	export let colors: string[];
+	type ObjectKeys<T> = keyof T;
+	type colorMapKeys = ObjectKeys<typeof colorMap>;
+	export let colors: colorMapKeys[];
 </script>
 
 <div class="flex flex-wrap gap-2 py-4">
@@ -11,5 +13,6 @@
 		>
 			{color}
 		</div>
+		
 	{/each}
 </div>
