@@ -5,21 +5,20 @@
 	import '@skeletonlabs/skeleton/styles/all.css';
 	// Most of your app wide CSS should be put in this file
 	import '../app.postcss';
-	import { invalidate } from '$app/navigation'
-	import { onMount } from 'svelte'
-	import type { LayoutData } from './$types'
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import type { LayoutData } from './$types';
 
-	export let data: LayoutData
+	export let data: LayoutData;
 
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
 	import ComboBox from '$lib/components/ComboBox.svelte';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
 
-
 	import { page } from '$app/stores';
 
-	$: ({ supabase, session } = data)
+	$: ({ supabase, session } = data);
 
 	function signout() {
 		supabase.auth.signOut();
@@ -27,46 +26,68 @@
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
+				invalidate('supabase:auth');
 			}
-		})
+		});
 
-		return () => data.subscription.unsubscribe()
-	})
-
+		return () => data.subscription.unsubscribe();
+	});
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-	const designDropdown = [
-		{ url: '/designs/create', label: 'Create' },
-		{ url: '/designs', label: 'View' }
-	];
-	const ordersDropdown = [
-		{ url: '/orders/create', label: 'Create' },
-		{ url: '/orders', label: 'View'}		 
-	];
+
+	const resources = ['customers', 'designs', 'orders']
+
+	const dropdowns = {};
+
+	resources.forEach(( name ) => {
+		dropdowns[name] = [
+			{ url: `/${name}/create`, label: 'Create' },
+			{ url: `/${name}`, label: 'View' }
+		];
+	});
+	
 </script>
 
 <AppShell>
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
-		<AppBar slotDefault="w-0" padding="max-sm:py-2 p-2" gap="gap-1 md:gap-4" background="bg-slate-950">
+		<AppBar
+			slotDefault="w-0"
+			padding="max-sm:py-2 p-2"
+			gap="gap-1 md:gap-4"
+			background="bg-slate-950"
+		>
 			<svelte:fragment slot="lead">
 				<div class="text-surface-900-50--token">
-					<a href="/" aria-label="Home Page" class="text-white "> 
-						<img class="h-8 md:h-14 hover:border-b-2 border-orange-500 p-1" src="/fleks-ko-logo-medium.png" alt="Fleks Ko Logo"/>
-					 </a>
+					<a href="/" aria-label="Home Page" class="text-white">
+						<img
+							class="h-8 md:h-14 hover:border-b-2 border-orange-500 p-1"
+							src="/fleks-ko-logo-medium.png"
+							alt="Fleks Ko Logo"
+						/>
+					</a>
 				</div>
 			</svelte:fragment>
 			<svelte:fragment slot="trail">
 				<div class="flex items-center gap-1 md:gap-2">
 					{#if $page.data.session}
-					<a href="/planner" class="btn btn-sm variant-ghost-secondary text-slate-300 hover:text-secondary-500">Planner</a>
-
-					<ComboBox comboboxValue={'Designs'} listItems={designDropdown} />
-					<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} />
-					<button type="button" class="btn btn-sm text-slate-300 hover:text-primary-500"  on:click={signout}>Sign Out</button>
+						<a
+							href="/planner"
+							class="btn btn-sm variant-ghost-secondary text-slate-300 hover:text-secondary-500"
+							>Planner</a
+						>
+						{#each Object.keys(dropdowns) as name}
+							<ComboBox comboboxValue={name} listItems={dropdowns[name]} />
+						{/each}
+						<!-- <ComboBox comboboxValue={'Designs'} listItems={designDropdown} />
+						<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} /> -->
+						<button
+							type="button"
+							class="btn btn-sm text-slate-300 hover:text-primary-500"
+							on:click={signout}>Sign Out</button
+						>
 					{:else}
-					<a href="/login" class="btn btn-sm text-slate-300 hover:text-primary-500">Sign In</a>
+						<a href="/login" class="btn btn-sm text-slate-300 hover:text-primary-500">Sign In</a>
 					{/if}
 					<!-- <LightSwitch /> -->
 				</div></svelte:fragment
