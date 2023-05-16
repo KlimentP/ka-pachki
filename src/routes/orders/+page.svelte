@@ -1,35 +1,30 @@
 <script lang="ts">
+	import OrderActionItems from '../../lib/components/OrderActionItems.svelte';
 	import Icon from '@iconify/svelte';
+
 	import type { PageData } from './$types';
-	import { Modal, modalStore, type AutocompleteOption } from '@skeletonlabs/skeleton';
-	import type { ModalComponent } from '@skeletonlabs/skeleton';
-	import ComboBox from '$lib/components/ComboBox.svelte';
-	import TooltipButton from '$lib/components/TooltipButton.svelte';
-	import StatusUpdate from '$lib/components/ActionForms/StatusUpdate.svelte';
-	import UrgencyUpdate from '$lib/components/ActionForms/UrgencyUpdate.svelte';
-	import AssignEmployee from '$lib/components/ActionForms/AssignEmployee.svelte';
-	import DeleteItem from '$lib/components/ActionForms/DeleteItem.svelte';
-	import UpdateUnitsProduced from '$lib/components/ActionForms/UpdateUnitsProduced.svelte';
+	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	import { dbToAutocomplete } from '$lib/utils/generic';
+	import Material from '$lib/components/Material.svelte';
+	import ColorScheme from '$lib/components/ColorScheme.svelte';
 
 	export let data: PageData;
 	let { tableData, employees } = data;
-	let selectedOrder = {};
 	// let filter = '';
 	// let filteredData = tableData;
 	const keysToFilter = [
 		'date_created',
+		'deadline',
 		'status',
 		'customer_name',
 		'quantity',
 		'design_name',
 		'material',
 		'color_scheme',
-		'deadline',
 		'design_name',
 		'employee',
 		'urgent',
-		'units_already_produced',
+		// 'units_already_produced',
 		'id'
 	];
 
@@ -42,17 +37,9 @@
 		}, {});
 	}
 
-	const modalComponentRegistry: Record<string, ModalComponent> = {
-		modalStatusUpdate: { ref: StatusUpdate, props: { action: '?/updateStatus' } },
-		modalUrgencyUpdate: { ref: UrgencyUpdate, props: { action: '?/updateUrgency' } },
-		modalAssignEmployee: { ref: AssignEmployee, props: { action: '?/assignEmployee' } },
-		modalUpdateUnitsProduced: {
-			ref: UpdateUnitsProduced,
-			props: { action: '?/updateUnitsProduced' }
-		},
-		modalDeleteItem: { ref: DeleteItem, props: { action: '?/deleteOrder' } }
-	};
-
+	function formatHeaders(header) {
+		return header.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+	}
 	const filteredData = tableData.map((obj) => filterObjectByKeys(obj, keysToFilter));
 	const headers = Object.keys(filteredData[0] || {});
 	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(employees);
@@ -76,173 +63,50 @@
 	// }
 </script>
 
-<Modal components={modalComponentRegistry} />
-<div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center">
+<div class="container h-full mx-auto flex flex-col justify-center items-center">
 	<!-- <input type="text" placeholder="Filter" bind:value={filter} on:input={handleFilterChange} /> -->
-	<div class="table-container border-primary-400 overflow-auto">
-		<table class="table table-comfortable table-auto bg-primary-200 text-slate-800">
-			<thead class="text-primary-400 !bg-slate-900">
-				<tr>
+
+	<div class="table-container rounded-t-none border-primary-400 max-h-[600px] overflow-y-auto">
+		<table class="table table-hover text-slate-800 !overflow-x-auto">
+			<thead class="rounded-b-none sticky top-0 text-slate-200 !bg-slate-900">
+				<tr class="">
 					<!-- Add table headers for each field here -->
-					<th>Actions</th>
+					<th class="!p-2">Actions</th>
 					{#each headers as header}
-						<th>{header}</th>
+						{#if header !== 'id'}
+							<th class="!p-2">{formatHeaders(header)}</th>
+						{/if}
 					{/each}
 				</tr>
 			</thead>
-			<tbody>
+			<tbody class="rounded-t-none">
 				{#each filteredData as item, index}
-					<tr>
+					<tr class="">
 						<td class="">
-							<ComboBox listBoxStyles="" comboboxValue={item.id} closeQuery="">
-								<Icon
-									class="text-slate-900"
-									slot="button"
-									height="24"
-									icon="ic:baseline-more-horiz"
-								/>
-								<div
-									class="flex flex-row gap-2 bg-slate-200 h-24 p-4 rounded-lg border-2
-								align-middle mx-auto justify-center items-center shadow-lg"
-									slot="listItems"
-								>
-									<TooltipButton target={`status-hover-${index}`}>
-										<button
-											type="button"
-											slot="button"
-											on:click={() => {
-												selectedOrder = item;
-
-												modalStore.trigger({
-													type: 'component',
-													component: 'modalStatusUpdate',
-													meta: { selectedOrder, field: 'Status' }
-												});
-											}}
-											class=""
-										>
-											<Icon
-												class="hover:text-primary-500"
-												height="24"
-												icon="carbon:task-complete"
-											/>
-										</button>
-										<div
-											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
-											slot="tooltip"
-										>
-											Update Status
-										</div></TooltipButton
-									>
-									<TooltipButton target={`urgency-hover-${index}`}>
-										<button
-											slot="button"
-											on:click={() => {
-												selectedOrder = item;
-
-												modalStore.trigger({
-													type: 'component',
-													component: 'modalUrgencyUpdate',
-													meta: { selectedOrder, field: 'Urgent Status' }
-												});
-											}}
-											class=""
-										>
-											<Icon
-												class="hover:text-primary-500"
-												height="24"
-												icon="fluent:alert-urgent-16-regular"
-											/>
-										</button>
-										<div
-											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
-											slot="tooltip"
-										>
-											Change Urgency
-										</div>
-									</TooltipButton>
-									<TooltipButton target={`assign_employee-hover-${index}`}>
-										<button
-											slot="button"
-											on:click={() => {
-												selectedOrder = item;
-
-												modalStore.trigger({
-													type: 'component',
-													component: 'modalAssignEmployee',
-													meta: { selectedOrder, field: 'Employee Assignment', employeeOptions }
-												});
-											}}
-										>
-											<Icon
-												class="hover:text-primary-500"
-												height="24"
-												icon="clarity:assign-user-line"
-											/>
-										</button>
-										<div
-											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
-											slot="tooltip"
-										>
-											Assign to Specific Employee
-										</div>
-									</TooltipButton>
-									<TooltipButton target={`produced-units-hover-${index}`}>
-										<button
-											slot="button"
-											on:click={() => {
-												selectedOrder = item;
-												modalStore.trigger({
-													type: 'component',
-													component: 'modalUpdateUnitsProduced',
-													meta: { selectedOrder, field: 'Units Produced' }
-												});
-											}}
-										>
-											<Icon
-												class="hover:text-primary-500"
-												height="24"
-												icon="fluent-mdl2:quantity"
-											/>
-										</button>
-										<div
-											class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48"
-											slot="tooltip"
-										>
-											Update Produced Units
-										</div>
-									</TooltipButton>
-									<TooltipButton target={`delete-hover-${index}`}>
-										<button
-											slot="button"
-											on:click={() => {
-												selectedOrder = item;
-												modalStore.trigger({
-													type: 'component',
-													component: 'modalDeleteItem',
-													meta: { selectedItem: selectedOrder, field: 'Order', formType: 'Delete', 
-												title: (selectedOrder?.customer_name || '') + ' - ' + (selectedOrder?.design_name || '') }
-												});
-											}}
-										>
-											<Icon
-												class="hover:text-red-500 "
-												height="24"
-												icon="material-symbols:delete-outline-sharp"
-											/>
-										</button>
-										<div
-											class="bg-slate-200 shadow-lg text-red-500 p-4 text-lg rounded-lg w-48"
-											slot="tooltip"
-										>
-											Delete Order
-										</div>
-									</TooltipButton>
-								</div>
-							</ComboBox>
+							<OrderActionItems {employeeOptions} {index} {item} />
 						</td>
-						{#each Object.values(item) as value}
-							<td>{value || ''}</td>
+						{#each Object.entries(item) as [key, value]}
+							{#if key === 'material'}
+								<td class="align-middle"><Material material={value} toolTip={false} /> </td>
+							{:else if key === 'color_scheme'}
+								<td class="!text-xs"><ColorScheme colors={value} /></td>
+							{:else if key === 'urgent'}
+								{#if value}
+									<td class="flex align-middle text-xs text-rose-700 font-bold"
+										><Icon height="32" icon="fluent:alert-urgent-16-regular" /></td
+									>
+								{:else}
+									<td />
+								{/if}
+							{:else if key === 'quantity'}
+								<td>
+									{`${item.units_already_produced ?? 0} / ${value} `}
+								</td>
+							{:else if key === 'date_created'}
+							<td>{new Date(value).toISOString().slice(0,10)}</td>
+							{:else if key !== 'id'}
+								<td>{value || ''}</td>
+							{/if}
 						{/each}
 					</tr>
 				{/each}
