@@ -24,7 +24,7 @@
 		'design_name',
 		'employee',
 		'urgent',
-		// 'units_already_produced',
+		'units_already_produced',
 		'id'
 	];
 
