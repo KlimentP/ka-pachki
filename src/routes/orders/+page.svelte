@@ -66,7 +66,7 @@
 <div class="container h-full mx-auto flex flex-col justify-center items-center">
 	<!-- <input type="text" placeholder="Filter" bind:value={filter} on:input={handleFilterChange} /> -->
 
-	<div class="table-container border-primary-400 max-h-[600px] overflow-y-auto">
+	<div class="table-container border-primary-400 max-h-[800px] overflow-y-auto">
 		<table class="table table-hover text-slate-800 !overflow-x-auto">
 			<thead class="rounded-b-none sticky top-0 text-slate-200 !bg-slate-900">
 				<tr class="">
