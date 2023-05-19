@@ -128,11 +128,13 @@
 						<div class="w-full p-4">
 							<Timeline>
 								{#each value as v, index}
+									{#if v?.type === 'order'}
 									<TimelineItem
 										title={v.design_name ?? ''}
 										timestamp={v.deadline ?? 'No Deadline'}
-										badgeText={convertMinutesToHoursMinutes(v.minutes_length) ?? 'Unknown Quantity'}
+										badgeText={convertMinutesToHoursMinutes(v.minutes_length) ?? 'Unknown Durarion'}
 										description=""
+										height={`${v.minutes_length}`}
 									>
 										<div slot="icon">{index + 1}</div>
 										<ColorScheme colors={v.color_scheme ?? []} />
@@ -143,6 +145,17 @@
 											</div>
 										</div>
 									</TimelineItem>
+									{:else if v?.type === 'cleanup' || v?.type === 'switch'}
+									<TimelineItem
+										title={v.type}
+										badgeText={convertMinutesToHoursMinutes(v.minutes_length) ?? 'Unknown Durarion'}
+										description=""
+										height={`${v.minutes_length}`}
+
+									>
+									<div slot="icon">{index + 1}</div>
+									</TimelineItem>
+									{/if}
 								{/each}
 							</Timeline>
 						</div>

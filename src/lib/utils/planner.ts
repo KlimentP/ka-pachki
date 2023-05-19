@@ -8,20 +8,18 @@ export const generatePlan = async (availableMachines: any, selectedOrders: any, 
 		'Content-Type': 'application/json',
 		Authorization: `Basic ${encodedAuthString}`
 	});
-
-	const res = await fetch(`${env.PUBLIC_OPTIMIZER_URL}/optimize`, {
-		method: 'POST',
-		headers,
-		body: JSON.stringify({ machines: availableMachines, orders: selectedOrders })
-	});
-
-	const { machines: planMachines, orders: planOrders } = await res.json();
-	plan = planMachines.reduce((acc: any, curr: string) => {
-		acc[curr] = planOrders;
-		return acc;
-	}, plan);
-	console.log(plan);
-	return plan;
+    let res;
+    try {
+        res = await fetch(`${env.PUBLIC_OPTIMIZER_URL}/optimize`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ machines: availableMachines, orders: selectedOrders })
+        });
+    } catch (error) {
+        console.log(error);
+        throw new Error('Error generating plan');
+    }
+	return await res.json();
 };
 
 export const formatOrderOptions = (orders: any) => {
