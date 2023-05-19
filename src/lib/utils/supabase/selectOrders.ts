@@ -17,6 +17,7 @@ export async function selectOrders() {
 		order.minutes_length = order.quantity && order.material && unitsRemaining > 0
 			? calculateMinutesLength(order.quantity - (order.units_already_produced ?? 0), order.material)
 			: 0;
+		order.name = order.design_name;
 		return order;
 	});
 	return orders;

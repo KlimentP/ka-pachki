@@ -1,3 +1,4 @@
+import time
 from typing import Optional
 from fastapi import FastAPI, Depends
 from fastapi.encoders import jsonable_encoder
@@ -28,8 +29,6 @@ async def root(
     orders: Optional[list[Order]] = None,
     dependencies=Depends(check_user),
 ):
-    with open("orders.json", "w") as f:
-        import json
-        json.dump(jsonable_encoder(orders), f)
+    time.sleep(0.5)
     return {"machines": machines, "orders": orders}
     # return optimize_orders(machine_names, orders)

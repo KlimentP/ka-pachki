@@ -1,63 +1,77 @@
 <script lang="ts">
-	import { env } from '$env/dynamic/public';
 	import { dbToAutocomplete } from '$lib/utils/generic';
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 	import Timeline from '$lib/components/Timeline/Timeline.svelte';
 	import TimelineItem from '$lib/components/Timeline/TimelineItem.svelte';
 	import Icon from '@iconify/svelte';
-	import { convertMinutesToHoursMinutes, capitalizeString } from '$lib/utils/generic';
+	import { convertMinutesToHoursMinutes } from '$lib/utils/generic';
 	import ColorScheme from '$lib/components/ColorScheme.svelte';
 	import Material from '$lib/components/Material.svelte';
+	import { generatePlan, formatOrderOptions } from '$lib/utils/planner';
+	import type { Machine } from '$lib/types';
 
 	export let data;
-	let loading = false;
 
-	const machines = ['Labels', 'Butter', 'Embossed Lids'] as const;
-	let availableMachines = machines;
 	let { orders, employees } = data;
-	let plan: {} | { [key in typeof machines[number]]: typeof orders } = {};
 	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(employees);
+	const orderOptions = formatOrderOptions(orders)
+	let selectedOrders = orderOptions.map((order) => order.value);
 
-	const machineIcons = {
-		'Embossed Lids': 'openmoji:jar',
-		Labels: 'quill:label',
-		Butter: 'fluent-emoji-high-contrast:butter'
+	const machines: { [K in Machine]: string } = {
+		butter: 'Butter',
+		label: 'Labels',
+		embossed_lid: 'Embossed Lids'
 	};
+	const machineIcons = {
+		'embossed_lid': 'openmoji:jar',
+		label: 'quill:label',
+		butter: 'fluent-emoji-high-contrast:butter'
+	};
+	let availableMachines = Object.keys(machines);
 
-	const generatePlan = async () => {
-		const authString = `${env.PUBLIC_OPTIMIZER_USER}:${env.PUBLIC_OPTIMIZER_PASSWORD}`;
-		const encodedAuthString = window.btoa(authString);
+	let loading = false;
+	let plan: any = {};
 
-		const headers = new Headers({
-			'Content-Type': 'application/json',
-			Authorization: `Basic ${encodedAuthString}`
-		});
-		loading = true;
-
-		const res = await fetch('http://127.0.0.1:8000/optimize', {
-			method: 'POST',
-			headers,
-			body: JSON.stringify({ machines: availableMachines, orders })
-		});
-		loading = false;
-		const { machines: planMachines, orders: planOrders } = await res.json();
-
-		plan = {};
-		plan = planMachines.reduce((acc: any, curr: string) => {
-			acc[curr] = planOrders;
-			return acc;
-		}, plan);
+	const handleSelectAll = (event: any) => {
+		if (event.target.checked) {
+			console.log('checked');
+			selectedOrders = orderOptions.map((order) => order.value);
+		} else {
+			selectedOrders = [];
+		}
 	};
 </script>
 
-<div class="container h-full w-full mx-auto flex flex-col gap-4 py-12 max-sm:px-2 items-center">
+<div class="container h-full w-full mx-auto flex flex-col gap-4 py-8 max-sm:px-2 items-center">
 	<header
 		class=" font-bold flex py-2 items-center justify-center mx-auto text-slate-800 text-4xl md:text-6xl"
 	>
-		Printing Planner 🦾
+		Let's Plan Some Printing 🦾
 	</header>
 	<div class="flex flex-col gap-4 p-4">
-		<div class="flex flex-row flex-wrap gap-4 justify-center">
+		<div class="grid grid-cols-2 flex-row flex-wrap gap-8 justify-center">
+			<section class="col-span-2 card card-hover shadow-lg rounded-md px-4 pb-4 h-96 overflow-auto">
+				<div class=" flex gap-4 sticky top-0 text-2xl text-slate-800 bg-inherit py-4 align-middle">
+					<input
+						class="checkbox h-6 w-6 self-center"
+						type="checkbox"
+						checked
+						on:change={handleSelectAll}
+					/>
+					<div>Which Orders to Send to Planner?</div>
+				</div>
+				{#each orderOptions as order}
+					<label class="flex items-center space-x-2 tracking-wide my-2" class:!bg-amber-300="{order.value?.urgent}">
+						<input
+							class="checkbox"
+							type="checkbox"
+							value={order.value}
+							bind:group={selectedOrders}
+						/>
+						<p class="text-slate-800 hover:text-primary-500">{order.label}</p>
+					</label>
+				{/each}
+			</section>
 			<section class="card card-hover shadow-lg rounded-md mx-auto p-4 md:w-96">
 				<div class="text-2xl text-slate-800 pb-2">Employees Available</div>
 				{#each employeeOptions as employee}
@@ -69,7 +83,7 @@
 			</section>
 			<section class="card card-hover flex flex-col items-start rounded-md mx-auto p-4 md:w-96">
 				<div class="text-2xl text-slate-800 pb-2">Machines Available</div>
-				{#each machines as machine}
+				{#each Object.entries(machines) as [machine, machineName]}
 					<label class="flex items-center space-x-2">
 						<input
 							class="checkbox"
@@ -78,21 +92,34 @@
 							value={machine}
 							checked
 						/>
-						<p class="text-slate-800 hover:text-primary-500">{machine}</p>
+						<p class="text-slate-800 hover:text-primary-500">{machineName}</p>
 					</label>
 				{/each}
 			</section>
 		</div>
-		<button on:click={generatePlan} class="btn bg-secondary-500 text-white font-bold">
+		<button
+			on:click={async () => {
+				loading = true;
+				plan = availableMachines.reduce((obj, m) => {
+					return { ...obj, [m]: [] };
+				}, {});
+
+				plan = await generatePlan(availableMachines, selectedOrders, plan);
+				loading = false;
+				const results = document.getElementById('planner-results');
+				results?.scrollIntoView({ behavior: 'smooth' })
+			}}
+			class="btn bg-secondary-500 text-white font-bold"
+		>
 			Generate Schedule
 		</button>
 	</div>
-	<section class="flex flex-wrap gap-8 justify-center max-h-screen overflow-y-auto">
+	<section id="planner-results" class="flex flex-wrap gap-8 justify-center max-h-screen overflow-y-auto py-2">
 		{#if Object.keys(plan).length > 0}
 			{#each Object.entries(plan) as [key, value]}
 				<div class="flex flex-col card gap-4 max-w-md p-4 max-sm:max-w-sm">
 					<div class="flex items-center gap-2 text-2xl text-slate-800 p-2">
-						{key}
+						{machines[key]}
 						<span><Icon icon={machineIcons[key]} /></span>
 					</div>
 					{#if loading}
