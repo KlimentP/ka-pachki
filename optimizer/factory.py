@@ -40,6 +40,7 @@ class Order(BaseModel):
     days_remaining: int = 7
     urgent: bool
     employee: str | None = None
+    status: str #TODO add enum
 
     class Config:
         arbitrary_types_allowed = True
@@ -192,7 +193,6 @@ class Factory:
         if machine_names is None:
             machine_names = list(self.machines.keys())
             # for m_temp in machine_names:
-            # print("from update factory status ", self.machines[m_temp].idle_time)
         self.status = {
             name: {
                 "idle_time": machine.idle_time,
@@ -212,8 +212,6 @@ class Factory:
             )
         if order.id in [x["order_id"] for x in self.scheduled_orders]:
             raise OrderNotFittingException("Order already assigned")
-        # if order.hours_length > self.available_hours + self.tolerance:
-        #     raise ValueError("Order too large for machine")
 
     def add_order(self, order: Order, machine_name: str) -> None:
         m = self.machines[machine_name]
@@ -233,7 +231,6 @@ class Factory:
         m.clear_orders()
         m.idle_time = idle_time
         m.items = items  # type: ignore
-        # print(m.items)
         self.scheduled_orders.extend(
             [
                 {"order_id": x.id, "machine_name": machine_name}

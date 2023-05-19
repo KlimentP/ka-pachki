@@ -57,16 +57,11 @@ class PermOptimizer:
             except (OrderNotFittingException, ValueError) as e:
                 if isinstance(e, OrderNotFittingException):
                     continue
-                print(traceback.format_exc())
-                print(machine.items)
-                print(perm, sum(x.minutes_length for x in perm))
                 raise Exception from e
             if (
                 machine.idle_time < min_idle_time
                 and machine.available_minutes >= -machine.tolerance
             ):
-                # print(machine.items)
-                # print(perm)
                 min_idle_time = machine.idle_time
                 best_fit = {
                     "idle_time": min_idle_time,
@@ -96,7 +91,6 @@ class PermOptimizer:
                 }
             # self.factory.update_status()
             total_idle_time = sum(x["idle_time"] for x in temp_fit.values())
-            print(temp_fit)
             if total_idle_time < min_idle_time:
                 min_idle_time = total_idle_time
                 self.optimized_idle_time = min_idle_time
@@ -182,17 +176,13 @@ def bundle_orders(orders: list[Order]) -> list[Order]:
 
 
 def optimize_orders(
-    machine_names: list[str] | None = None, orders: list[Order] | None = None
+    machine_names: list[str] | None = None,
+    orders: list[Order] | None = None,
+    max_perm_size=4,
 ):
     if machine_names is None:
         machine_names = MACHINE_TYPES
-    lengths = [
-        1,
-        2,
-        3,
-        4,
-        # 5,
-    ]
+    lengths = [x for x in range(1, max_perm_size + 1)]
     if orders is None:
         employees = {
             "Bobi": Employee("1", "Bobi", "label"),
@@ -223,14 +213,8 @@ def optimize_orders(
 
 
 if __name__ == "__main__":
-#     opt = main()
-#     # print(opt.best_fit)
-#     print("opt time", opt.optimized_idle_time)
-#     print("status", opt.factory.status)
-#     print("orders", opt.factory.scheduled_orders)
     orders, machine_names = None, None
     opt = optimize_orders()
-    # print(opt.best_fit)
     print("opt time", opt.optimized_idle_time)
     print("status", opt.factory.status)
     print("orders", opt.factory.scheduled_orders)

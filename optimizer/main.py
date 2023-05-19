@@ -1,7 +1,6 @@
 import time
 from typing import Optional
 from fastapi import FastAPI, Depends
-from fastapi.encoders import jsonable_encoder
 
 from factory import Order
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,8 +26,9 @@ app.add_middleware(
 async def root(
     machines: Optional[list[str]] = None,
     orders: Optional[list[Order]] = None,
+    max_perm_size: Optional[int] = 3,
     dependencies=Depends(check_user),
 ):
-    time.sleep(0.5)
-    return {"machines": machines, "orders": orders}
-    # return optimize_orders(machine_names, orders)
+    opt = optimize_orders(machines, orders, max_perm_size)
+    return {k:v.items for k,v in opt.factory.machines.items()}
+    # return {"machines": machines, "orders": orders}
