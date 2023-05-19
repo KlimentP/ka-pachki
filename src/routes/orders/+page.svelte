@@ -66,14 +66,14 @@
 <div class="container h-full mx-auto flex flex-col justify-center items-center">
 	<!-- <input type="text" placeholder="Filter" bind:value={filter} on:input={handleFilterChange} /> -->
 
-	<div class="table-container rounded-t-none border-primary-400 max-h-[600px] overflow-y-auto">
+	<div class="table-container border-primary-400 max-h-[600px] overflow-y-auto">
 		<table class="table table-hover text-slate-800 !overflow-x-auto">
 			<thead class="rounded-b-none sticky top-0 text-slate-200 !bg-slate-900">
 				<tr class="">
 					<!-- Add table headers for each field here -->
 					<th class="!p-2">Actions</th>
 					{#each headers as header}
-						{#if header !== 'id'}
+						{#if header !== 'id' && header !== 'units_already_produced'}
 							<th class="!p-2">{formatHeaders(header)}</th>
 						{/if}
 					{/each}
@@ -104,7 +104,7 @@
 								</td>
 							{:else if key === 'date_created'}
 							<td>{new Date(value).toISOString().slice(0,10)}</td>
-							{:else if key !== 'id'}
+							{:else if key !== 'id' && key !== 'units_already_produced'}
 								<td>{value || ''}</td>
 							{/if}
 						{/each}
