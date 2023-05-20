@@ -15,7 +15,7 @@
 	let { orders, employees } = data;
 	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(employees);
 	const orderOptions = formatOrderOptions(orders)
-	let selectedOrders = orderOptions.map((order) => order.value);
+	let selectedOrders = orders;
 
 	const machines: { [K in Machine]: string } = {
 		butter: 'Butter',
@@ -35,7 +35,7 @@
 	const handleSelectAll = (event: any) => {
 		if (event.target.checked) {
 			console.log('checked');
-			selectedOrders = orderOptions.map((order) => order.value);
+			selectedOrders = orders;
 		} else {
 			selectedOrders = [];
 		}
