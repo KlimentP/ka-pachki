@@ -103,8 +103,7 @@
 				plan = availableMachines.reduce((obj, m) => {
 					return { ...obj, [m]: [] };
 				}, {});
-
-				plan = await generatePlan(availableMachines, selectedOrders, plan);
+				plan = await generatePlan(availableMachines, selectedOrders);
 				loading = false;
 				const results = document.getElementById('planner-results');
 				results?.scrollIntoView({ behavior: 'smooth' })

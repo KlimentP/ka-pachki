@@ -1,16 +1,16 @@
 import { env } from '$env/dynamic/public';
 
-export const generatePlan = async (availableMachines: any, selectedOrders: any, plan: any) => {
-	plan = {};
+export const generatePlan = async (availableMachines: any, selectedOrders: any) => {
 	const authString = `${env.PUBLIC_OPTIMIZER_USER}:${env.PUBLIC_OPTIMIZER_PASSWORD}`;
 	const encodedAuthString = window.btoa(authString);
 	const headers = new Headers({
 		'Content-Type': 'application/json',
 		Authorization: `Basic ${encodedAuthString}`
 	});
+    const url = env.PUBLIC_PROD === 'true' ? `${env.PUBLIC_OPTIMIZER_URL_PROD}/optimize` : `${env.PUBLIC_OPTIMIZER_URL_DEV}/optimize`;
     let res;
     try {
-        res = await fetch(`${env.PUBLIC_OPTIMIZER_URL}/optimize`, {
+        res = await fetch(url, {
             method: 'POST',
             headers,
             body: JSON.stringify({ machines: availableMachines, orders: selectedOrders })
