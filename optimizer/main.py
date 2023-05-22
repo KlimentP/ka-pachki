@@ -1,8 +1,7 @@
-import time
 from typing import Optional
 from fastapi import FastAPI, Depends
 
-from factory import Order
+from factory import Employee, Order
 from fastapi.middleware.cors import CORSMiddleware
 
 from optimize import optimize_orders
@@ -26,7 +25,9 @@ app.add_middleware(
 async def root(
     machines: Optional[list[str]] = None,
     orders: Optional[list[Order]] = None,
+    employees: Optional[list[Employee]] = None,
     max_perm_size: Optional[int] = 3,
+
     dependencies=Depends(check_user),
 ):
     opt = optimize_orders(machines, orders, max_perm_size)

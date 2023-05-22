@@ -1,16 +1,14 @@
 from itertools import permutations
-import traceback
 
 from factory import (
     Employee,
+    FactorySettings,
     Machine,
     Order,
     Factory,
     Bundle,
-    mock_order,
     load_sample_orders,
-    MACHINE_TYPES,
-    MATERIAL_TYPES,
+    factory_settings,
     OrderNotFittingException,
 )
 from permutations import get_all_perms
@@ -104,100 +102,132 @@ class PermOptimizer:
         self.factory.update_status()
 
 
-def sort_perms_by_machine(
-    perms: list[list[Order]],
-    machine_names: list[str],
-) -> dict[str, list[list[Order]]]:
-    perms_by_machine: dict[str, list[list[Order]]] = {x: [] for x in machine_names}
-    for perm in perms:
-        for order in perm:
-            if order.material == "lid":
-                for m in machine_names:
-                    perms_by_machine[m].append(perm)
-                break
-            if order.material in machine_names:
-                perms_by_machine[order.material].append(perm)
-                break
+class OptimizerUtils:
+    def __init__(self, factory_settings: FactorySettings = factory_settings):
+        self.factory_settings = factory_settings
 
-    return perms_by_machine
+    def narrow_down_orders(self, orders: list[Order]) -> list[Order]:
+        # skip already completed:
+        outstanding = [x for x in orders if x.status != "completed"]
+        butters = [x for x in outstanding if x.material == "butter"]
+        butters_duration = sum(x.minutes_length for x in butters)
+        # skip butter orders if they are less than 350 minutes
+        # and there are no urgent butter orders:
+        if (
+            butters_duration
+            < self.factory_settings.available_butter_time
+            - 2 * self.factory_settings.tolerance
+            and not any(x.urgent for x in butters)
+        ):
+            return [x for x in orders if x.material != "butter"]
+        return orders
 
+    def get_threshold_duration(self, item: Bundle | Order):
+        thresholds = {
+            "butter": self.factory_settings.available_butter_time,
+            "default": self.factory_settings.available_lid_time,
+        }
+        return thresholds.get(item.material, thresholds["default"])
 
-def narrow_down_orders(orders: list[Order]) -> list[Order]:
-    # skip already completed:
-    outstanding = [x for x in orders if x.status != "completed"]
-    butters = [x for x in outstanding if x.material == "butter"]
-    butters_duration = sum(x.minutes_length for x in butters)
-    if butters_duration < 350:
-        return [x for x in orders if x.material != "butter"]
-    return orders
+    def break_down_big_orders(self, orders: list[Order]) -> list[Order]:
+        # break down orders that are longer than the respective threshold:
+        big_orders = [
+            x for x in orders if x.minutes_length > self.get_threshold_duration(x)
+        ]
+        for order in big_orders:
+            theshold = self.get_threshold_duration(order)
+            order_count = order.minutes_length // theshold + 1
+            remainder = order.minutes_length % theshold
+            new_orders = [order.copy() for _ in range(order_count)]
+            for i, new_order in enumerate(new_orders):
+                new_order.id = f"{order.id}_{i}"
+                new_order.minutes_length = theshold
+            if remainder:
+                new_orders[-1].minutes_length = remainder
+            orders.remove(order)
+            orders.extend(new_orders)
+        return orders
 
+    @staticmethod
+    def handle_urgent_orders(orders: list[Order]) -> list[Order]:
+        # handle urgent orders first:
+        urgent_orders = [x for x in orders if x.urgent]
 
-def break_down_big_orders(orders: list[Order]) -> list[Order]:
-    # break down orders that are longer than 450 minutes:
-    big_orders = [x for x in orders if x.minutes_length > 425]
-    for order in big_orders:
-        order_count = order.minutes_length // 425 + 1
-        remainder = order.minutes_length % 425
-        new_orders = [order.copy() for _ in range(order_count)]
-        for i, new_order in enumerate(new_orders):
-            new_order.id = f"{order.id}_{i}"
-            new_order.minutes_length = 425
-        if remainder:
-            new_orders[-1].minutes_length = remainder
-        orders.remove(order)
-        orders.extend(new_orders)
-    return orders
+        return orders
 
+    @staticmethod
+    def sort_perms_by_machine(
+        perms: list[list[Order]],
+        machine_names: list[factory_settings.machine_types_literal],
+        urgent_orders: list[Order] | None = None,
+    ) -> dict[str, list[list[Order]]]:
+        perms_by_machine: dict[str, list[list[Order]]] = {x: [] for x in machine_names}
 
-def bundle_orders(orders: list[Order]) -> list[Order]:
-    bundle_options = []
-    # get unique combos of material + color scheme:
-    for o in orders:
-        prop = (o.material, set(o.computed_color_scheme))
-        if prop not in bundle_options:
-            bundle_options.append(prop)
-    bundles = []
-    for bundle_option in bundle_options:
-        # bundle orders with same material and color scheme,
-        # but less than 425 minutes because they would.or take who day anyways:
-        temp_b = []
-        for x in orders:
-            if x.material == bundle_option[0] and set(x.computed_color_scheme) == set(
-                bundle_option[1]
-            ):
-                if x.minutes_length >= 425:
-                    bundles.append([x])
-                    continue
-                temp_b.append(x)
-        if temp_b:
-            bundles.append(temp_b)
-    # return standalone orders or bundles:
-    return [x[0] if len(x) == 1 else Bundle(x) for x in bundles]
+        for perm in perms:
+            for order in perm:
+                if order.material == "lid":
+                    for m in machine_names:
+                        perms_by_machine[m].append(perm)
+                    break
+                if order.material in machine_names:
+                    perms_by_machine[order.material].append(perm)
+                    break
+
+        urgent_orders = urgent_orders or []
+        for order in urgent_orders:
+            ...
+
+        return perms_by_machine
+
+    def bundle_orders(self, orders: list[Order]) -> list[Order]:
+        bundle_options = []
+        # get unique combos of material + color scheme:
+        for o in orders:
+            prop = (o.material, set(o.computed_color_scheme))
+            if prop not in bundle_options:
+                bundle_options.append(prop)
+        bundles = []
+        for bundle_option in bundle_options:
+            # bundle orders with same material and color scheme,
+            # but less than threhold minutes because they would.or take who day anyways:
+            temp_b = []
+            for x in orders:
+                if x.material == bundle_option[0] and set(
+                    x.computed_color_scheme
+                ) == set(bundle_option[1]):
+                    if x.minutes_length >= self.get_threshold_duration(x):
+                        bundles.append([x])
+                        continue
+                    temp_b.append(x)
+            if temp_b:
+                bundles.append(temp_b)
+        # return standalone orders or bundles:
+        return [x[0] if len(x) == 1 else Bundle(x) for x in bundles]
 
 
 def optimize_orders(
     machine_names: list[str] | None = None,
     orders: list[Order] | None = None,
+    employees: list[Employee] | None = None,
     max_perm_size=4,
+    optimizer_utils: OptimizerUtils = OptimizerUtils(),
 ):
     if machine_names is None:
-        machine_names = MACHINE_TYPES
-    lengths = [x for x in range(1, max_perm_size + 1)]
+        machine_names = factory_settings.machine_types
+    lengths = list(range(1, max_perm_size + 1))
     if orders is None:
-        employees = {
-            "Bobi": Employee("1", "Bobi", "label"),
-            "Sasho": Employee("2", "Sasho", "butter"),
-            "Valter": Employee("3", "Valter", "embossed_lid"),
-        }
-
-        # orders = [mock_order(i, employees) for i in range(12)] #TODO drop once done
         orders = load_sample_orders()
-
-    filtered_orders = narrow_down_orders(orders)
-    brokendown_orders = break_down_big_orders(filtered_orders.copy())
-    bundles = bundle_orders(brokendown_orders)
+    if employees is None:
+        employees = [
+            Employee("1", "Bobi", "label"),
+            Employee("2", "Sasho", "butter"),
+            Employee("3", "Valter", "embossed_lid"),
+        ]
+    filtered_orders = optimizer_utils.narrow_down_orders(orders)
+    brokendown_orders = optimizer_utils.break_down_big_orders(filtered_orders.copy())
+    bundles = optimizer_utils.bundle_orders(brokendown_orders)
     perms = get_all_perms(bundles, lengths, parallel=True)
-    perm_by_machine = sort_perms_by_machine(perms, machine_names)
+    perm_by_machine = optimizer_utils.sort_perms_by_machine(perms, machine_names)
     # Define the batch size for permutations of length 6
     machines_list = [Machine(x, [], ["lid", x]) for x in machine_names]
     machines = {x.name: x for x in machines_list}

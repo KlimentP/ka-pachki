@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import json
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, root_validator, BaseSettings
 import math
 from typing import Literal
 from uuid import uuid4
@@ -8,22 +8,58 @@ import random
 from typing import Protocol
 
 
-MATERIAL_TYPES_LITERAL = Literal["butter", "label", "embossed_lid", "uv_butter", "lid"]
-MATERIAL_TYPES = MATERIAL_TYPES_LITERAL.__args__  # type: ignore
+@dataclass
+class DownTime:
+    name: str
+    type: Literal["cleanup", "switch"]
+    minutes_length: int
 
-MACHINE_TYPES_LITERAL = Literal[
-    "butter",
-    "label",
-    "embossed_lid",
-]
-MACHINE_TYPES = MACHINE_TYPES_LITERAL.__args__  # type: ignore
+    def process(self, machine):
+        machine.add_down_time(self)
+
+
+class FactorySettings(BaseSettings):
+    start_cleanup: DownTime = DownTime("Start", "cleanup", 30)
+    butter_extra_start_cleanup: DownTime = DownTime("Butter Clean", "cleanup", 20)
+    end_cleanup: DownTime = DownTime("End", "cleanup", 40)
+    butter_switch = DownTime("Butter Clean", "cleanup", 30)
+    total_time: int = 6 * 80
+    tolerance: int = 15
+    min_run_time: int = 240
+    available_butter_time: int = (
+        total_time
+        - start_cleanup.minutes_length
+        - butter_extra_start_cleanup.minutes_length
+        - end_cleanup.minutes_length
+        + tolerance
+    )
+    available_lid_time: int = (
+        total_time
+        - start_cleanup.minutes_length
+        - end_cleanup.minutes_length
+        + tolerance
+    )
+    machine_types_literal = Literal["butter", "label", "embossed_lid"]
+    machine_types = machine_types_literal.__args__  # type: ignore
+    material_types_literal = Literal[
+        "butter", "label", "embossed_lid", "uv_butter", "lid"
+    ]
+    material_types = material_types_literal.__args__ # type: ignore
+    specific_types = [x for x in material_types if x != "lid"] 
+    base_switch: int = 20
+    color_switch: int = 5
+    lid_to_butter_switch: int = 120
+    same_material_switch: int = 0
+
+
+factory_settings = FactorySettings()
 
 
 @dataclass
 class Employee:
     id: str
     name: str
-    machine: MACHINE_TYPES_LITERAL
+    # machine: factory_settings.machine_types_literal  # type: ignore
 
 
 class Order(BaseModel):
@@ -35,12 +71,12 @@ class Order(BaseModel):
     quantity: int
     units_already_produced: int
     deadline: str | None
-    material: MATERIAL_TYPES_LITERAL
+    material: factory_settings.material_types_literal  # type: ignore
     minutes_length: int | None
     days_remaining: int = 7
     urgent: bool
     employee: str | None = None
-    status: str #TODO add enum
+    status: str  # TODO add enum
 
     class Config:
         arbitrary_types_allowed = True
@@ -64,7 +100,7 @@ class Bundle:
     type = "bundle"
     orders: list[Order]
     minutes_length: int = Field(init=False)
-    material: MATERIAL_TYPES_LITERAL = Field(init=False)
+    material: factory_settings.material_types_literal = Field(init=False)  # type: ignore
 
     def __post_init__(self):
         self.minutes_length = sum(x.minutes_length for x in self.orders)
@@ -72,16 +108,6 @@ class Bundle:
 
     def process(self, machine):
         machine.multiple_orders(self.orders)
-
-
-@dataclass
-class DownTime:
-    name: str
-    type: Literal["cleanup", "switch"]
-    minutes_length: int
-
-    def process(self, machine):
-        machine.add_down_time(self)
 
 
 class Processable(Protocol):
@@ -95,12 +121,12 @@ class Processable(Protocol):
 
 @dataclass
 class Machine:
-    name: MACHINE_TYPES_LITERAL
+    name: factory_settings.machine_types_literal  # type: ignore
     items: list[Order | DownTime]
     # operating_employees: list[Employee]
-    acceptable_materials: list[MATERIAL_TYPES_LITERAL]
-    capacity_minutes: int = 8 * 60
-    tolerance: float = 15
+    acceptable_materials: list[factory_settings.machine_types_literal]  # type: ignore
+    capacity_minutes: int = factory_settings.total_time
+    tolerance: float = factory_settings.tolerance
     full: bool = False
     idle_time = capacity_minutes
     available_minutes = capacity_minutes
@@ -109,8 +135,8 @@ class Machine:
         self.initialize_cleanups()
 
     def initialize_cleanups(self):
-        self.add_down_time(DownTime("Start", "cleanup", 30), initial=True)
-        self.add_down_time(DownTime("End", "cleanup", 40), initial=True)
+        self.add_down_time(factory_settings.start_cleanup, initial=True)
+        self.add_down_time(factory_settings.end_cleanup, initial=True)
 
     def deduct_item_minutes(self, item):
         self.available_minutes -= item.minutes_length
@@ -129,16 +155,20 @@ class Machine:
         self.deduct_item_minutes(downtime)
 
     @staticmethod
-    def compute_switch_difference(order1: Order, order2: Order) -> int:
-        base = 20
+    def compute_switch_difference(
+        order1: Order,
+        order2: Order,
+        switch_settings: FactorySettings = factory_settings,
+    ) -> int:
         own, other = set(order1.color_scheme), set(order2.color_scheme)
         diff = (own | other) - (own & other)
-        color_diff = len(diff) * 5
-        if order1.material == order2.material:
-            material_diff = 0
-        elif "butter" in (order1.material, order2.material):
-            material_diff = 120
-        return base + color_diff + material_diff
+        color_diff = len(diff) * switch_settings.color_switch
+        material_diff = switch_settings.same_material_switch
+
+        # this handles butter and uv_butter:
+        if any("butter" in x for x in (order1.material, order2.material)):
+            material_diff = switch_settings.lid_to_butter_switch
+        return switch_settings.base_switch + color_diff + material_diff
 
     def add_item(self, item: Processable) -> None:
         item.process(self)
@@ -152,7 +182,7 @@ class Machine:
             # inserting first switch, then order, always before the cleanup:
             self.add_item(switch)  # type: ignore
         elif order.material == "butter":
-            self.add_item(DownTime("Butter Clean", "cleanup", 20))  # type: ignore
+            self.add_item(factory_settings.butter_extra_start_cleanup)  # type: ignore
         self.items[-1:-1] = [order]
         self.deduct_item_minutes(order)
 
@@ -162,7 +192,7 @@ class Machine:
                 self.add_order(order)
             # if last order is butter, deduce further 30min:
             if orders[-1].material == "butter":
-                self.add_down_time(DownTime("Butter Clean", "cleanup", 30))
+                self.add_down_time(factory_settings.butter_switch)
         except ValueError as e:
             self.clear_orders()
             raise ValueError(e) from e

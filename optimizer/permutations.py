@@ -2,16 +2,19 @@ from itertools import permutations
 from functools import partial
 
 from multiprocessing import Pool
-from factory import Order, MATERIAL_TYPES
+from factory import Order, factory_settings
 
 
 # TODO think about this combo of material and employee
 def conditional_perm(
-    p: list[Order], specific_materials=MATERIAL_TYPES
+    p: list[Order], specific_materials=factory_settings.material_types # TODO change back to specific types
 ) -> bool:  # sourcery skip: use-named-expression
     sum_mins = sum(x.minutes_length for x in p)
 
-    if sum_mins < 200 or sum_mins > 495:
+    if (
+        sum_mins < factory_settings.min_run_time
+        or sum_mins > factory_settings.available_lid_time
+    ):
         return False
     # employees = [x.employee for x in p if x is not None]
     # if employees:
