@@ -71,7 +71,7 @@ class PermOptimizer:
             self.factory.set_schedule(
                 best_fit["perm"], best_fit["idle_time"], machine_name  # type: ignore
             )
-            self.factory.update_status()
+            print(self.factory.status)
         else:
             print(f"No best fit found for {machine_name} ")
 
@@ -87,7 +87,6 @@ class PermOptimizer:
                     "perm": self.factory.machines[machine].items,
                     "idle_time": self.factory.machines[machine].idle_time,
                 }
-            # self.factory.update_status()
             total_idle_time = sum(x["idle_time"] for x in temp_fit.values())
             if total_idle_time < min_idle_time:
                 min_idle_time = total_idle_time
@@ -99,7 +98,7 @@ class PermOptimizer:
         self.best_fit = best_fit
         for machine_name, fit in best_fit.items():
             self.factory.set_schedule(fit["perm"], fit["idle_time"], machine_name)
-        self.factory.update_status()
+        print(self.factory.status)
 
 
 class OptimizerUtils:
@@ -155,13 +154,16 @@ class OptimizerUtils:
 
         return orders
 
-    @staticmethod
     def sort_perms_by_machine(
+        self,
         perms: list[list[Order]],
         machine_names: list[factory_settings.machine_types_literal],
         urgent_orders: list[Order] | None = None,
     ) -> dict[str, list[list[Order]]]:
         perms_by_machine: dict[str, list[list[Order]]] = {x: [] for x in machine_names}
+
+        urgent_orders = urgent_orders or []
+        # for machine in machine_names:
 
         for perm in perms:
             for order in perm:
@@ -173,9 +175,9 @@ class OptimizerUtils:
                     perms_by_machine[order.material].append(perm)
                     break
 
-        urgent_orders = urgent_orders or []
         for order in urgent_orders:
-            ...
+            if order.material != "lid":
+                ...
 
         return perms_by_machine
 
@@ -206,19 +208,25 @@ class OptimizerUtils:
 
 
 def optimize_orders(
-    machine_names: list[str] | None = None,
-    orders: list[Order] | None = None,
-    employees: list[Employee] | None = None,
+    machine_names: list[str],
+    orders: list[Order],
+    employees: list[Employee],
     max_perm_size=4,
     optimizer_utils: OptimizerUtils = OptimizerUtils(),
+    factory_settings: FactorySettings = factory_settings,
 ):
-    if machine_names is None:
-        machine_names = factory_settings.machine_types
+    
+    machines = []
+    for name in machine_names:
+        if name not in factory_settings.machine_types:
+            raise ValueError(f"Invalid {name}")
+        machines.append(
+            Machine(name, [], factory_settings.machine_material_pairs[name])
+        )
+
     lengths = list(range(1, max_perm_size + 1))
-    if orders is None:
-        orders = load_sample_orders()
-    if employees is None:
-        employees = [
+
+    employees = [
             Employee("1", "Bobi", "label"),
             Employee("2", "Sasho", "butter"),
             Employee("3", "Valter", "embossed_lid"),
@@ -229,9 +237,8 @@ def optimize_orders(
     perms = get_all_perms(bundles, lengths, parallel=True)
     perm_by_machine = optimizer_utils.sort_perms_by_machine(perms, machine_names)
     # Define the batch size for permutations of length 6
-    machines_list = [Machine(x, [], ["lid", x]) for x in machine_names]
-    machines = {x.name: x for x in machines_list}
-    factory = Factory(machines)
+
+    factory = Factory({m.name: m for m in machines})
 
     opt = PermOptimizer(factory, perm_by_machine)
     opt.fit_perms_factory()
@@ -240,11 +247,3 @@ def optimize_orders(
     #     "orders": opt.factory.scheduled_orders,
     #     "status": opt.factory.status,
     # }
-
-
-if __name__ == "__main__":
-    orders, machine_names = None, None
-    opt = optimize_orders()
-    print("opt time", opt.optimized_idle_time)
-    print("status", opt.factory.status)
-    print("orders", opt.factory.scheduled_orders)

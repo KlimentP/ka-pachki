@@ -45,6 +45,11 @@ class FactorySettings(BaseSettings):
         "butter", "label", "embossed_lid", "uv_butter", "lid"
     ]
     material_types = material_types_literal.__args__ # type: ignore
+    machine_material_pairs = {
+        "butter": ["butter", "lid"],
+        "label": ["label", "uv_butter", "lid"],
+        "embossed_lid": ["embossed_lid", "lid"],
+    }
     specific_types = [x for x in material_types if x != "lid"] 
     base_switch: int = 20
     color_switch: int = 5
@@ -214,16 +219,11 @@ class OrderNotFittingException(Exception):
 @dataclass
 class Factory:
     machines: dict[str, Machine]
-    least_busy_machine: Machine | None = None
-    full_machines: list[Machine] = field(default_factory=list)
     scheduled_orders: list[dict] = field(default_factory=list)
-    status: dict = field(default_factory=dict)
 
-    def update_status(self, machine_names: list[str] | None = None) -> None:
-        if machine_names is None:
-            machine_names = list(self.machines.keys())
-            # for m_temp in machine_names:
-        self.status = {
+    @property
+    def status(self):
+        return {
             name: {
                 "idle_time": machine.idle_time,
                 "full": machine.full,
@@ -268,7 +268,7 @@ class Factory:
                 if x.type == "order"
             ]
         )
-        self.update_status()
+        print(self.status)
 
     def add_multiple_orders(
         self,
