@@ -14,8 +14,8 @@
 	let { orders, employees } = data;
 	let employeeOptions = employees.map((e) => {
 		return {
-			label: e.name,
-			value: e.name
+			label: e?.name,
+			value: e?.name
 		};
 	});
 	const orderOptions = formatOrderOptions(orders);
@@ -36,7 +36,7 @@
 	const availableMachines = Object.keys(machineOptions).map( m => {
 		return {
 			name:m,
-			employee: employees.find(e => e.machines.name == m).name,
+			employee: employees.find(e => e?.machines?.name == m)?.name,
 			checked: true
 		}
 	})
@@ -117,7 +117,7 @@
 									bind:checked={machine.checked}
 									type="checkbox"
 								/>
-								<p class="text-slate-800 w-36">{machineOptions[machine.name]}</p>
+								<p class="text-slate-800 w-36">{machineOptions[machine?.name]}</p>
 							</label>
 							<select
 								class="select max-w-xs !max-h-12" bind:value={machine.employee}
@@ -137,7 +137,7 @@
 				error = null;
 				loading = true;
 				plan = availableMachines.filter(m => m.checked).reduce((obj, m) => {
-					return { ...obj, [m.name]: [] };
+					return { ...obj, [m?.name]: [] };
 				}, {});
 
 				try {

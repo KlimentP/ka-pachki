@@ -3,8 +3,8 @@ import {
     PUBLIC_SUPABASE_ANON_KEY
   } from '$env/static/public';
   import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
-  import type { Handle } from '@sveltejs/kit';
-  
+  import { redirect, type Handle } from '@sveltejs/kit';
+
   export const handle: Handle = async ({ event, resolve }) => {
     event.locals.supabase = createSupabaseServerClient({
       supabaseUrl: PUBLIC_SUPABASE_URL,
@@ -21,7 +21,12 @@ import {
       } = await event.locals.supabase.auth.getSession();
       return session;
     };
-  
+    if (event.url.pathname !== '/signup' && event.url.pathname !== '/login') {
+      const session = await event.locals.getSession();
+      if (!session) {
+        throw redirect(303, '/signup')
+      }
+    }
     return resolve(event, {
       /**
        * There´s an issue with `filterSerializedResponseHeaders` not working when using `sequence`
