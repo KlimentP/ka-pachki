@@ -27,15 +27,15 @@
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-					for="design-name"
+					for="customer-name"
 				>
-					Design Name
+					Customer Name
 				</label>
 				<input
 					class="input"
 					name="name"
 					type="text"
-					placeholder="Design Name"
+					placeholder="Customer Name"
 					bind:value={$form.name}
 					data-invalid={$errors.name}
 					{...$constraints.name}
