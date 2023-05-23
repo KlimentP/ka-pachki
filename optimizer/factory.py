@@ -196,7 +196,7 @@ class Machine:
             switch = DownTime("Switch", "switch", switch_difference)
             # inserting first switch, then order, always before the cleanup:
             self.add_item(switch)  # type: ignore
-        elif order.material == "butter":
+        elif order.material in ("butter", "uv_butter"):
             self.add_item(factory_settings.butter_extra_start_cleanup)  # type: ignore
         self.items[-1:-1] = [order]
         self.deduct_item_minutes(order)
