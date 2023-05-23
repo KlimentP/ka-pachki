@@ -147,39 +147,63 @@ class OptimizerUtils:
             orders.extend(new_orders)
         return orders
 
-    @staticmethod
-    def handle_urgent_orders(orders: list[Order]) -> list[Order]:
-        # handle urgent orders first:
-        urgent_orders = [x for x in orders if x.urgent]
-
-        return orders
-
     def sort_perms_by_machine(
         self,
         perms: list[list[Order]],
-        machine_names: list[factory_settings.machine_types_literal],
+        machines: list[Machine],
         urgent_orders: list[Order] | None = None,
+        max_perm_size: int = 4,
     ) -> dict[str, list[list[Order]]]:
-        perms_by_machine: dict[str, list[list[Order]]] = {x: [] for x in machine_names}
+        """
+        This function sorts permutations of orders by machine.
 
+        Args:
+            perms: A list of lists of Order objects representing different permutations of orders.
+            machines: A list of Machine objects.
+            urgent_orders: A list of Order objects representing urgent orders.
+            max_perm_size: The maximum size of a permutation.
+
+        Returns:
+            A dictionary where keys are machine names and values are lists of permutations of orders sorted by machine.
+        """
+        perms_by_machine = {x.name: [] for x in machines} # type: ignore
         urgent_orders = urgent_orders or []
-        # for machine in machine_names:
 
-        for perm in perms:
-            for order in perm:
-                if order.material == "lid":
-                    for m in machine_names:
-                        perms_by_machine[m].append(perm)
-                    break
-                if order.material in machine_names:
-                    perms_by_machine[order.material].append(perm)
-                    break
-
-        for order in urgent_orders:
-            if order.material != "lid":
-                ...
+        for machine in machines:
+            if urgent_for_machine := self.get_urgent_orders_for_machine(
+                machine, urgent_orders
+            ):
+                perms_by_machine[machine.name] = self.get_perms_for_machine(
+                    perms, urgent_for_machine, max_perm_size
+                )
+            else:
+                perms_by_machine[
+                    machine.name
+                ] = self.get_perms_for_machine_without_urgent(perms, machine)
 
         return perms_by_machine
+
+    def get_urgent_orders_for_machine(
+        self, machine: Machine, urgent_orders: list[Order]
+    ) -> list[Order]:
+        return [x for x in urgent_orders if x.material in machine.urgent_materials]
+
+    def get_perms_for_machine(self, perms, urgent_for_machine, max_perm_size):
+        if len(urgent_for_machine) == max_perm_size:
+            return [urgent_for_machine]
+        return [x for x in perms if all(y in x for y in urgent_for_machine)]
+
+    def get_perms_for_machine_without_urgent(self, perms, machine):
+        perms_for_machine = []
+        for perm in perms:
+            for order in perm:
+                if (
+                    order.material == "lid"
+                    or order.material in machine.acceptable_materials
+                ):
+                    perms_for_machine.append(perm)
+                    break
+        return perms_for_machine
 
     def bundle_orders(self, orders: list[Order]) -> list[Order]:
         bundle_options = []
@@ -208,34 +232,38 @@ class OptimizerUtils:
 
 
 def optimize_orders(
-    machine_names: list[str],
+    machine_employees: list[str],
     orders: list[Order],
-    employees: list[Employee],
     max_perm_size=4,
     optimizer_utils: OptimizerUtils = OptimizerUtils(),
     factory_settings: FactorySettings = factory_settings,
 ):
     
     machines = []
-    for name in machine_names:
+    for name in [x.name for x in machine_employees]:
         if name not in factory_settings.machine_types:
             raise ValueError(f"Invalid {name}")
         machines.append(
-            Machine(name, [], factory_settings.machine_material_pairs[name])
+            Machine(
+                name,
+                [],
+                factory_settings.machine_material_pairs[name]["acceptable_materials"],
+                factory_settings.machine_material_pairs[name]["urgent_materials"],
+            )
         )
 
     lengths = list(range(1, max_perm_size + 1))
 
     employees = [
-            Employee("1", "Bobi", "label"),
-            Employee("2", "Sasho", "butter"),
-            Employee("3", "Valter", "embossed_lid"),
-        ]
+        Employee("1", "Bobi",),
+        Employee("2", "Sasho",),
+        Employee("3", "Valter", ),
+    ]
     filtered_orders = optimizer_utils.narrow_down_orders(orders)
     brokendown_orders = optimizer_utils.break_down_big_orders(filtered_orders.copy())
     bundles = optimizer_utils.bundle_orders(brokendown_orders)
     perms = get_all_perms(bundles, lengths, parallel=True)
-    perm_by_machine = optimizer_utils.sort_perms_by_machine(perms, machine_names)
+    perm_by_machine = optimizer_utils.sort_perms_by_machine(perms, machines)
     # Define the batch size for permutations of length 6
 
     factory = Factory({m.name: m for m in machines})

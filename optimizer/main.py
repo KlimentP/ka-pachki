@@ -1,7 +1,8 @@
 from typing import Optional
 from fastapi import FastAPI, Depends
+from pydantic import BaseModel
 
-from factory import Employee, Order
+from factory import Order, factory_settings
 from fastapi.middleware.cors import CORSMiddleware
 
 from optimize import optimize_orders
@@ -20,16 +21,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class MachineEmployee(BaseModel):
+    name: factory_settings.machine_types_literal
+    employee: str
 
 @app.post("/optimize")
 async def root(
-    machines: Optional[list[str]] = None,
-    orders: Optional[list[Order]] = None,
-    employees: Optional[list[Employee]] = None,
+    machines_employees: list[MachineEmployee],
+    orders: list[Order],
     max_perm_size: Optional[int] = 3,
-
     dependencies=Depends(check_user),
 ):
-    opt = optimize_orders(machines, orders, max_perm_size)
+    opt = optimize_orders(machines_employees, orders, max_perm_size)
     return {k:v.items for k,v in opt.factory.machines.items()}
     # return {"machines": machines, "orders": orders}

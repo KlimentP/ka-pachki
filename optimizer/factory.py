@@ -44,13 +44,22 @@ class FactorySettings(BaseSettings):
     material_types_literal = Literal[
         "butter", "label", "embossed_lid", "uv_butter", "lid"
     ]
-    material_types = material_types_literal.__args__ # type: ignore
+    material_types = material_types_literal.__args__  # type: ignore
     machine_material_pairs = {
-        "butter": ["butter", "lid"],
-        "label": ["label", "uv_butter", "lid"],
-        "embossed_lid": ["embossed_lid", "lid"],
+        "butter": {
+            "acceptable_materials": ["butter", "lid"],
+            "urgent_materials": ["butter"],
+        },
+        "label": {
+            "acceptable_materials": ["label", "lid", "uv_butter"],
+            "urgent_materials": ["label", "uv_butter"],
+        },
+        "embossed_lid": {
+            "acceptable_materials": ["embossed_lid", "lid"],
+            "urgent_materials": ["embossed_lid", "lid"],
+        },
     }
-    specific_types = [x for x in material_types if x != "lid"] 
+    specific_types = [x for x in material_types if x != "lid"]
     base_switch: int = 20
     color_switch: int = 5
     lid_to_butter_switch: int = 120
@@ -130,6 +139,7 @@ class Machine:
     items: list[Order | DownTime]
     # operating_employees: list[Employee]
     acceptable_materials: list[factory_settings.machine_types_literal]  # type: ignore
+    urgent_materials: list[factory_settings.machine_types_literal]  # type: ignore
     capacity_minutes: int = factory_settings.total_time
     tolerance: float = factory_settings.tolerance
     full: bool = False

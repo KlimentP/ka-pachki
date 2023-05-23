@@ -1,24 +1,32 @@
 import { env } from '$env/dynamic/public';
 
-export const generatePlan = async (availableMachines: any, selectedOrders: any) => {
+export const generatePlan = async (
+	availableMachines: any,
+	selectedOrders: any,
+	// selectedEmployees: any
+) => {
 	const authString = `${env.PUBLIC_OPTIMIZER_USER}:${env.PUBLIC_OPTIMIZER_PASSWORD}`;
 	const encodedAuthString = window.btoa(authString);
 	const headers = new Headers({
 		'Content-Type': 'application/json',
 		Authorization: `Basic ${encodedAuthString}`
 	});
-    const url = env.PUBLIC_PROD === 'true' ? `${env.PUBLIC_OPTIMIZER_URL_PROD}/optimize` : `${env.PUBLIC_OPTIMIZER_URL_DEV}/optimize`;
-    let res;
-    try {
-        res = await fetch(url, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ machines: availableMachines, orders: selectedOrders })
-        });
-    } catch (error) {
-        console.log(error);
-        throw new Error('Error generating plan');
-    }
+	const url =
+		env.PUBLIC_PROD === 'true'
+			? `${env.PUBLIC_OPTIMIZER_URL_PROD}/optimize`
+			: `${env.PUBLIC_OPTIMIZER_URL_DEV}/optimize`;
+	let res;
+	console.log(availableMachines)
+	try {
+		res = await fetch(url, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({ machines_employees: availableMachines, orders: selectedOrders})
+		});
+	} catch (error) {
+		console.log(error);
+		throw new Error('Error generating plan');
+	}
 	return await res.json();
 };
 
