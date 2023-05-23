@@ -8,10 +8,9 @@
     export let formName: string;
 	// export let inputChipList = form[formName];
 	function onInputChipSelect(event: any): void {
-		if (form[formName].includes(event.detail.value) === false) {
-			form[formName] = [...form[formName], event.detail.value];
-			inputChip = '';
-		}
+
+		form[formName] = [...form[formName], event.detail.value];
+		inputChip = '';
 	}
 </script>
 
@@ -22,7 +21,7 @@
 		class="max-h-24"
 		bind:input={inputChip}
 		{options}
-		denylist={form[formName]}
+		denylist={[]}
 		on:selection={onInputChipSelect}
 	/>
 </div>
