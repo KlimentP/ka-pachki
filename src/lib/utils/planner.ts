@@ -21,7 +21,7 @@ export const generatePlan = async (
 		res = await fetch(url, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify({ machines_employees: availableMachines, orders: selectedOrders})
+			body: JSON.stringify({ machines: availableMachines, orders: selectedOrders})
 		});
 	} catch (error) {
 		console.log(error);

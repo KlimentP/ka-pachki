@@ -19,7 +19,7 @@
 	});
 	// export let form;
 
-	let employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
+	let machineOptions: AutocompleteOption[] = dbToAutocomplete(data.machines);
 	let colorOptions: AutocompleteOption[] = dbToAutocomplete(data.colors);
 </script>
 
@@ -99,23 +99,23 @@
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
 					for="material"
 				>
-					Preferred Employee
+					Preferred Machine
 				</label>
 				<select
 					class="select"
-					name="preferred_employee_id"
+					name="preferred_machine_id"
 					size="3"
-					bind:value={$form.preferred_employee_id}
-					data-invalid={$errors.preferred_employee_id}
-					{...$constraints.preferred_employee_id}
+					bind:value={$form.preferred_machine_id}
+					data-invalid={$errors.preferred_machine_id}
+					{...$constraints.preferred_machine_id}
 				>
-					{#each employeeOptions as employee}
-						<option value={employee.value}>{employee.label}</option>
+					{#each machineOptions as machine}
+						<option value={machine.value}>{machine.label}</option>
 					{/each}
 				</select>
 			</div>
-			{#if $errors.preferred_employee_id}<span class="text-error-500"
-					>{$errors.preferred_employee_id}</span
+			{#if $errors.preferred_machine_id}<span class="text-error-500"
+					>{$errors.preferred_machine_id}</span
 				>{/if}
 		</div>
 		{#if Object.keys($errors).length > 0}

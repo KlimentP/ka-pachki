@@ -18,7 +18,8 @@
 	});
 	let customerOptions: AutocompleteOption[] = dbToAutocomplete(data.customers);
 	let designOptions: AutocompleteOption[] = dbToAutocomplete(data.designs);
-	let employeeOptions: AutocompleteOption[] = dbToAutocomplete(data.employees);
+	let machineOptions: AutocompleteOption[] = dbToAutocomplete(data.machines);
+	
 </script>
 
 <div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center max-sm:p-4">
@@ -65,7 +66,7 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<!-- <div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -85,8 +86,8 @@
 					<option value="completed">Completed</option>
 				</select>
 			</div>
-		</div>
-		<div class="flex flex-wrap -mx-3 mb-6">
+		</div> -->
+		<!-- <div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -103,24 +104,24 @@
 					{...$constraints.units_already_produced}
 				/>
 			</div>
-		</div>
+		</div> -->
 		<div class="flex flex-wrap -mx-3 mb-6">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
 					for="material"
 				>
-					Specifically Assign Employee
+					Specifically Assign Machine
 				</label>
 				<select
 					class="select"
-					name="assigned_employee_id"
+					name="assigned_machine_id"
 					size="4"
-					bind:value={$form.assigned_employee_id}
-					{...$constraints.assigned_employee_id}
+					bind:value={$form.assigned_machine_id}
+					{...$constraints.assigned_machine_id}
 				>
-					{#each employeeOptions as employee}
-						<option value={employee.value}>{employee.label}</option>
+					{#each machineOptions as machine}
+						<option value={machine.value}>{machine.label}</option>
 					{/each}
 				</select>
 			</div>

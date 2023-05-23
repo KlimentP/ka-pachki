@@ -11,9 +11,9 @@
 				<div class="flex flex-row flex-wrap gap-2 ">
 					<div class="text-slate-800 font-bold">Material:</div>
 					<div class=""><Material iconHeight="24" material={item.material} /></div>
-					{#if item?.employees?.name}
-						<div class="font-bold text-slate-800">Preferred Employee:</div>
-						<span class="text-slate-800">{item?.employees?.name || 'None'}</span>
+					{#if item?.machines?.name}
+						<div class="font-bold text-slate-800">Preferred Machine:</div>
+						<span class="text-slate-800">{item?.machines?.name || 'None'}</span>
 					{/if}
 				</div>
 			</section>

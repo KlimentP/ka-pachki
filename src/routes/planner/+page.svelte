@@ -7,17 +7,16 @@
 	import Material from '$lib/components/Material.svelte';
 	import { generatePlan, formatOrderOptions } from '$lib/utils/planner';
 	import type { Machine } from '$lib/types';
-	import AssignEmployee from '$lib/components/ActionForms/AssignEmployee.svelte';
 
 	export let data;
 
-	let { orders, employees } = data;
-	let employeeOptions = employees.map((e) => {
-		return {
-			label: e?.name,
-			value: e?.name
-		};
-	});
+	let { orders } = data;
+	// let employeeOptions = employees.map((e) => {
+	// 	return {
+	// 		label: e?.name,
+	// 		value: e?.name
+	// 	};
+	// });
 	const orderOptions = formatOrderOptions(orders);
 	let selectedOrders = orders;
 
@@ -33,13 +32,9 @@
 		butter: 'fluent-emoji-high-contrast:butter'
 	};
 
-	const availableMachines = Object.keys(machineOptions).map( m => {
-		return {
-			name:m,
-			employee: employees.find(e => e?.machines?.name == m)?.name,
-			checked: true
-		}
-	})
+	const machines = Object.keys(machineOptions)
+	let availableMachines = machines;
+	console.log(machines, availableMachines)
 
 	let loading = false;
 	let plan: any = {};
@@ -103,30 +98,32 @@
 				{/each}
 			</section> -->
 			<section class="col-span-2 card card-hover flex flex-col rounded-md pb-2 px-4">
-				<div class="flex gap-16 md:gap-48 align-middle py-2">
+				<!-- <div class="flex gap-16 md:gap-48 align-middle py-2"> -->
 					<div class=" text-2xl text-slate-800">Machines Available</div>
-					<p class="text-slate-800 hover:text-primary-500 w-36 self-center">Assigned Employee</p>
+					<!-- <p class="text-slate-800 hover:text-primary-500 w-36 self-center">Assigned Employee</p> -->
 
-				</div>
+				<!-- </div> -->
 				<div class="flex flex-col gap-2">
-					{#each availableMachines as machine}
+					{#each machines as machine}
 						<div class="flex justify-between items-center border-b-2 pb-2 border-slate-400 hover:border-primary-500">
 							<label class="flex gap-2">
 								<input
 									class="checkbox"
-									bind:checked={machine.checked}
+									bind:group={availableMachines}
+									checked
+									value={machine}
 									type="checkbox"
 								/>
-								<p class="text-slate-800 w-36">{machineOptions[machine?.name]}</p>
+								<p class="text-slate-800 w-36">{machineOptions[machine]}</p>
 							</label>
-							<select
+							<!-- <select
 								class="select max-w-xs !max-h-12" bind:value={machine.employee}
 							>
 								{#each employeeOptions as employee}
 									<option class=""  >{employee.label}</option>
 							
 								{/each}
-							</select>
+							</select> -->
 						</div>
 					{/each}
 				</div>

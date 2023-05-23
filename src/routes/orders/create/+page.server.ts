@@ -7,12 +7,12 @@ const resourceType = 'orders';
 const defaultHandle = handleCreateSubmit(ordersInsertSchema, resourceType, true)
 
 export async function load({ locals }) {
-	const { data: employees } = await locals.supabase.from('employees').select('name, id');
+	const { data: machines } = await locals.supabase.from('machines').select('name, id');
 	const { data: designs } = await locals.supabase.from('designs').select('name,id');
 	const { data: customers } = await locals.supabase.from('customers').select('name,id');
 	const form = superValidate(ordersInsertSchema);
 
-	return { employees: employees ?? [], designs: designs ?? [], customers: customers ?? [], form };
+	return { machines: machines ?? [], designs: designs ?? [], customers: customers ?? [], form };
 }
 
 export const actions = {

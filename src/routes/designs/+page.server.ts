@@ -6,7 +6,7 @@ export async function load({ locals }) {
 	const { supabase } = locals;
     const {data} = await supabase
     .from(resource)
-    .select('*, employees (name)' )
+    .select('*, machines (name)' )
     return {tableData: data ?? [],};
 }
 

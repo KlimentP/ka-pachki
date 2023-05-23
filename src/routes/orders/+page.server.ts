@@ -5,9 +5,9 @@ const resource = 'orders';
 const deleteOrder = handleDelete(resource);
 
 export async function load({ locals }) {
-	const { data } = await locals.supabase.from('orders_full').select('*');
-	const { data: employees } = await locals.supabase.from('employees').select('name,id');
-	return { tableData: data ?? [], employees: employees ?? [] };
+	const { data } = await locals.supabase.from('orders_full').select('*').order('date_created', { ascending: false });
+	const { data: machines } = await locals.supabase.from('machines').select('name,id');
+	return { tableData: data ?? [], machines: machines ?? [] };
 }
 
 export const actions = {
@@ -27,11 +27,11 @@ export const actions = {
 			.eq('id', data.get('id'));
 		handleModalFormErrors(error);
 	},
-	assignEmployee: async ({ request, locals }) => {
+	assignMachine: async ({ request, locals }) => {
 		const data = await request.formData();
 		const { error } = await locals.supabase
 			.from('orders')
-			.update({ assigned_employee_id: data.get('assigned_employee_id') })
+			.update({ assigned_machine_id: data.get('assigned_machine_id') })
 			.eq('id', data.get('id'));
 		handleModalFormErrors(error);
 	},

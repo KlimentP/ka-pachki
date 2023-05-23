@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { modalStore } from '@skeletonlabs/skeleton';
 	import BaseActionForm from './BaseActionForm.svelte';
-	const { selectedOrder, employeeOptions } = $modalStore[0].meta;
+	const { selectedOrder, machineOptions } = $modalStore[0].meta;
 	export let action: string;
 </script>
 
@@ -11,16 +11,16 @@
 			class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
 			for="material"
 		>
-			Specifically Assign Employee
+			Specifically Assign Machine
 		</label>
 		<select
 			class="select"
-			name="assigned_employee_id"
+			name="assigned_machine_id"
 			size="4"
-			bind:value={selectedOrder.assigned_employee_id}
+			bind:value={selectedOrder.assigned_machine_id}
 		>
-			{#each employeeOptions as employee}
-				<option value={employee.value}>{employee.label}</option>
+			{#each machineOptions as machine}
+				<option value={machine.value}>{machine.label}</option>
 			{/each}
 		</select>
 	</div>

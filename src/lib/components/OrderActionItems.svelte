@@ -6,20 +6,20 @@
 	import TooltipButton from '$lib/components/TooltipButton.svelte';
 	import StatusUpdate from '$lib/components/ActionForms/StatusUpdate.svelte';
 	import UrgencyUpdate from '$lib/components/ActionForms/UrgencyUpdate.svelte';
-	import AssignEmployee from '$lib/components/ActionForms/AssignEmployee.svelte';
+	import AssignMachine from '$lib/components/ActionForms/AssignMachine.svelte';
 	import DeleteItem from '$lib/components/ActionForms/DeleteItem.svelte';
 	import UpdateUnitsProduced from '$lib/components/ActionForms/UpdateUnitsProduced.svelte';
 
 
 	export let item: any;
 	export let index: number;
-	export let employeeOptions : AutocompleteOption[];
+	export let machineOptions : AutocompleteOption[];
 	let selectedOrder = {};
 
 	const modalComponentRegistry: Record<string, ModalComponent> = {
 		modalStatusUpdate: { ref: StatusUpdate, props: { action: '?/updateStatus' } },
 		modalUrgencyUpdate: { ref: UrgencyUpdate, props: { action: '?/updateUrgency' } },
-		modalAssignEmployee: { ref: AssignEmployee, props: { action: '?/assignEmployee' } },
+		modalAssignMachine: { ref: AssignMachine, props: { action: '?/assignMachine' } },
 		modalUpdateUnitsProduced: {
 			ref: UpdateUnitsProduced,
 			props: { action: '?/updateUnitsProduced' }
@@ -89,7 +89,7 @@
 				Change Urgency
 			</div>
 		</TooltipButton>
-		<TooltipButton target={`assign_employee-hover-${index}`}>
+		<TooltipButton target={`assign_Machine-hover-${index}`}>
 			<button
 				slot="button"
 				on:click={() => {
@@ -97,15 +97,15 @@
 
 					modalStore.trigger({
 						type: 'component',
-						component: 'modalAssignEmployee',
-						meta: { selectedOrder, field: 'Employee Assignment', employeeOptions }
+						component: 'modalAssignMachine',
+						meta: { selectedOrder, field: 'Machine Assignment', machineOptions }
 					});
 				}}
 			>
-				<Icon class="hover:text-primary-500" height="24" icon="clarity:assign-user-line" />
+				<Icon class="hover:text-primary-500" height="24" icon="majesticons:printer-line" />
 			</button>
 			<div class="bg-slate-200 shadow-lg text-slate-800 p-4 text-lg rounded-lg w-48" slot="tooltip">
-				Assign to Specific Employee
+				Assign to Specific Machine
 			</div>
 		</TooltipButton>
 		<TooltipButton target={`produced-units-hover-${index}`}>

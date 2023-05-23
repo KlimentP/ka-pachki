@@ -6,11 +6,12 @@ const resourceType = 'designs';
 const defaultHandle = handleCreateSubmit(designsInsertSchema, resourceType);
 
 export async function load({ locals }) {
-	const { data: employees } = await locals.supabase.from('employees').select('*');
-	const { data: colors } = await locals.supabase.from('colors').select('*');
+	const { data: machines } = await locals.supabase.from('machines').select('*');
+	const { data: colors } = await locals.supabase.from('color_options').select('*');
+	console.log(colors);
 	const newColors = colors?.map((color) => ({ id: color.name, name: color.name }));
 	const form = superValidate(designsInsertSchema);
-	return { employees: employees ?? [], colors: newColors ?? [], form };
+	return { machines: machines ?? [], colors: newColors ?? [], form };
 }
 /** @type {import('./$types').Actions} */
 export const actions = {

@@ -9,7 +9,7 @@
 	import ColorScheme from '$lib/components/ColorScheme.svelte';
 
 	export let data: PageData;
-	let { tableData, employees } = data;
+	let { tableData, machines } = data;
 	// let filter = '';
 	// let filteredData = tableData;
 	const keysToFilter = [
@@ -22,7 +22,7 @@
 		'material',
 		'color_scheme',
 		'design_name',
-		'employee',
+		'machine',
 		'urgent',
 		'units_already_produced',
 		'id'
@@ -42,7 +42,7 @@
 	}
 	const filteredData = tableData.map((obj) => filterObjectByKeys(obj, keysToFilter));
 	const headers = Object.keys(filteredData[0] || {});
-	const employeeOptions: AutocompleteOption[] = dbToAutocomplete(employees);
+	const machineOptions: AutocompleteOption[] = dbToAutocomplete(machines);
 
 	// function handleFilterChange(event) {
 	// 	filter = event.target.value;
@@ -83,7 +83,7 @@
 				{#each filteredData as item, index}
 					<tr class="">
 						<td class="">
-							<OrderActionItems {employeeOptions} {index} {item} />
+							<OrderActionItems {machineOptions} {index} {item} />
 						</td>
 						{#each Object.entries(item) as [key, value]}
 							{#if key === 'material'}

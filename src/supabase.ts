@@ -37,24 +37,24 @@ export interface Database {
 					id: number;
 					material: string;
 					name: string;
-					preferred_employee_id: number | null;
+					preferred_machine_id: number | null;
 				};
 				Insert: {
 					color_scheme: string[];
 					id?: number;
 					material: string;
 					name: string;
-					preferred_employee_id?: number | null;
+					preferred_machine_id?: number | null;
 				};
 				Update: {
 					color_scheme?: string[];
 					id?: number;
 					material?: string;
 					name?: string;
-					preferred_employee_id?: number | null;
+					preferred_machine_id?: number | null;
 				};
 			};
-			employees: {
+			machines: {
 				Row: {
 					id: number;
 					name: string;
@@ -70,7 +70,7 @@ export interface Database {
 			};
 			orders: {
 				Row: {
-					assigned_employee_id: number | null;
+					assigned_machine_id: number | null;
 					closed_by: string | null;
 					created_by: string;
 					customer_id: number | null;
@@ -88,7 +88,7 @@ export interface Database {
 					urgent: boolean;
 				};
 				Insert: {
-					assigned_employee_id?: number | null;
+					assigned_machine_id?: number | null;
 					closed_by?: string | null;
 					created_by: string;
 					customer_id?: number | null;
@@ -106,7 +106,7 @@ export interface Database {
 					urgent?: boolean;
 				};
 				Update: {
-					assigned_employee_id?: number | null;
+					assigned_machine_id?: number | null;
 					closed_by?: string | null;
 					created_by?: string;
 					customer_id?: number | null;
@@ -128,7 +128,7 @@ export interface Database {
 		Views: {
 			orders_full: {
 				Row: {
-					assigned_employee_id: number | null;
+					assigned_machine_id: number | null;
 					closed_by: string | null;
 					closed_by_email: string | null;
 					color_scheme: string[] | null;
@@ -143,7 +143,7 @@ export interface Database {
 					design_id: number | null;
 					design_name: string | null;
 					duration_order: number | null;
-					employee: string | null;
+					machine: string | null;
 					material: string | null;
 					notes: string | null;
 					id: string | null;
