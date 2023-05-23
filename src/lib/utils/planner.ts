@@ -34,7 +34,7 @@ export const formatOrderOptions = (orders: any) => {
 	return orders.map((order) => ({
 		label: `${order.design_name} - ${order.units_already_produced}/${order.quantity} produced -  ${
 			order.material
-		} - ${order.minutes_length} minutes  ${order.deadline ?? ''}`,
+		} - ${order?.minutes_length} minutes  due in ${order?.days_remaining ?? '?'} days`,
 		value: order
 	}));
 };
