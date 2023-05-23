@@ -87,9 +87,9 @@ class Order(BaseModel):
     deadline: str | None
     material: factory_settings.material_types_literal  # type: ignore
     minutes_length: int | None
-    days_remaining: int = 7
+    days_remaining: int | None = None
     urgent: bool
-    employee: str | None = None
+    machine: factory_settings.machine_types_literal | None = None # type: ignore
     status: str  # TODO add enum
 
     class Config:
@@ -115,10 +115,11 @@ class Bundle:
     orders: list[Order]
     minutes_length: int = Field(init=False)
     material: factory_settings.material_types_literal = Field(init=False)  # type: ignore
-
+    days_remaining: int = Field(init=False)
     def __post_init__(self):
         self.minutes_length = sum(x.minutes_length for x in self.orders)
         self.material = self.orders[0].material
+        
 
     def process(self, machine):
         machine.multiple_orders(self.orders)
@@ -148,6 +149,7 @@ class Machine:
 
     def __post_init__(self):
         self.initialize_cleanups()
+    
 
     def initialize_cleanups(self):
         self.add_down_time(factory_settings.start_cleanup, initial=True)
@@ -278,7 +280,7 @@ class Factory:
                 if x.type == "order"
             ]
         )
-        print(self.status)
+        # print(self.status)
 
     def add_multiple_orders(
         self,

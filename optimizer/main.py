@@ -1,6 +1,5 @@
 from typing import Optional
 from fastapi import FastAPI, Depends
-from pydantic import BaseModel
 
 from factory import Order, factory_settings
 from fastapi.middleware.cors import CORSMiddleware

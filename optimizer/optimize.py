@@ -1,4 +1,5 @@
 from itertools import permutations
+from typing import Any
 
 from factory import (
     # Employee,
@@ -37,11 +38,23 @@ class PermOptimizer:
                 orders_flat.append(p)
         return orders_flat
 
+    @staticmethod
+    def calc_weighted_perm_urgency(perm: list[Order]) -> float:
+        numerator, denominator = 0, 0
+        for order in perm:
+            if order.days_remaining is None:
+                # TODO handle missing days_remaining in a better way:
+                numerator += 7 * order.minutes_length
+            else:
+                numerator += order.days_remaining * order.minutes_length
+            denominator += order.minutes_length
+        return numerator / denominator
+
     def fit_perms_machine(
         self,
         machine_name: str,
     ):
-        best_fit = {}
+        best_fit: dict[str, Any] = {"avg_days_remaining": 9999}
         machine: Machine = self.factory.machines[machine_name]
         min_idle_time = self.min_idle_time
         # factory.clear_orders()
@@ -52,26 +65,32 @@ class PermOptimizer:
                 orders_flat = self.flatten_permutation(perm)
                 self.factory.add_multiple_orders(orders_flat, machine_name)
             # if the perm doesn't fit, dont consider it for optimal solution:
-            except (OrderNotFittingException, ValueError) as e:
-                if isinstance(e, OrderNotFittingException):
+            except (OrderNotFittingException, ValueError):
                     continue
-                raise Exception from e
-            if (
-                machine.idle_time < min_idle_time
-                and machine.available_minutes >= -machine.tolerance
-            ):
-                min_idle_time = machine.idle_time
-                best_fit = {
-                    "idle_time": min_idle_time,
-                    "perm": machine.items.copy(),
-                }
+            if machine.available_minutes >= -machine.tolerance:
+                if machine.idle_time < min_idle_time:
+                    min_idle_time = machine.idle_time
+                    best_fit = {
+                        "idle_time": min_idle_time,
+                        "perm": machine.items.copy(),
+                        "avg_days_remaining": self.calc_weighted_perm_urgency(orders_flat)
+                    }
+                elif machine.idle_time == min_idle_time:
+                    avg_days_remaining = self.calc_weighted_perm_urgency(orders_flat)
+                    print(avg_days_remaining, "avg days remaining, current best:", best_fit["avg_days_remaining"])
+                    if avg_days_remaining < best_fit["avg_days_remaining"]:
+                        best_fit = {
+                            "idle_time": min_idle_time,
+                            "perm": machine.items.copy(),
+                            "avg_days_remaining": avg_days_remaining
+                        }
             self.factory.clear_orders([machine_name])
         # re-add once we know the best perm
         if best_fit:
             self.factory.set_schedule(
                 best_fit["perm"], best_fit["idle_time"], machine_name  # type: ignore
             )
-            print(self.factory.status)
+            # print(self.factory.status)
         else:
             print(f"No best fit found for {machine_name} ")
 
@@ -98,12 +117,21 @@ class PermOptimizer:
         self.best_fit = best_fit
         for machine_name, fit in best_fit.items():
             self.factory.set_schedule(fit["perm"], fit["idle_time"], machine_name)
-        print(self.factory.status)
+        # print(self.factory.status)
 
 
 class OptimizerUtils:
     def __init__(self, factory_settings: FactorySettings = factory_settings):
         self.factory_settings = factory_settings
+
+    @staticmethod
+    def sort_by_urgency(orders: list[Order]) -> list[Order]:
+        def sort_func(x):
+            if x.urgent:
+                return -1 if x.days_remaining is None else -99999 + x.days_remaining
+            return 9999 if x.days_remaining is None else x.days_remaining
+
+        return sorted(orders, key=lambda x: sort_func(x))
 
     def narrow_down_orders(self, orders: list[Order]) -> list[Order]:
         # skip already completed:
@@ -124,7 +152,7 @@ class OptimizerUtils:
     def get_threshold_duration(self, item: Bundle | Order):
         thresholds = {
             "butter": self.factory_settings.available_butter_time,
-            "uv_butter":  self.factory_settings.available_butter_time,
+            "uv_butter": self.factory_settings.available_butter_time,
             "default": self.factory_settings.available_lid_time,
         }
         return thresholds.get(item.material, thresholds["default"])
@@ -165,7 +193,7 @@ class OptimizerUtils:
         Returns:
             A dictionary where keys are machine names and values are lists of permutations of orders sorted by machine.
         """
-        perms_by_machine = {x.name: [] for x in machines} # type: ignore
+        perms_by_machine = {x.name: [] for x in machines}  # type: ignore
         urgent_orders = urgent_orders or []
 
         for machine in machines:
@@ -204,30 +232,48 @@ class OptimizerUtils:
                     break
         return perms_for_machine
 
+    def get_unique_properties(self, orders: list[Order]) -> list[tuple]:
+        return list(
+            {
+                (order.material, frozenset(order.computed_color_scheme))
+                for order in orders
+            }
+        )
+
+    def create_bundle(self, orders: list[Order], material, color_scheme):
+        bundled_orders = []
+        bundle_duration = 0
+
+        for order in orders:
+            if (
+                order.material == material
+                and frozenset(order.computed_color_scheme) == color_scheme
+            ):
+                if order.minutes_length >= self.get_threshold_duration(order):
+                    yield [order]
+                elif (
+                    bundle_duration + order.minutes_length
+                    <= self.get_threshold_duration(order)
+                ):
+                    bundle_duration += order.minutes_length
+                    bundled_orders.append(order)
+                else:
+                    yield bundled_orders
+                    bundled_orders = [order]
+                    bundle_duration = order.minutes_length
+
+        if bundled_orders:
+            yield bundled_orders
+
     def bundle_orders(self, orders: list[Order]) -> list[Order]:
-        bundle_options = []
-        # get unique combos of material + color scheme:
-        for o in orders:
-            prop = (o.material, set(o.computed_color_scheme))
-            if prop not in bundle_options:
-                bundle_options.append(prop)
+        orders = self.sort_by_urgency(orders)
+        unique_properties = self.get_unique_properties(orders)
+
         bundles = []
-        for bundle_option in bundle_options:
-            # bundle orders with same material and color scheme,
-            # but less than threhold minutes because they would.or take who day anyways:
-            temp_b = []
-            for x in orders:
-                if x.material == bundle_option[0] and set(
-                    x.computed_color_scheme
-                ) == set(bundle_option[1]):
-                    if x.minutes_length >= self.get_threshold_duration(x):
-                        bundles.append([x])
-                        continue
-                    temp_b.append(x)
-            if temp_b:
-                bundles.append(temp_b)
-        # return standalone orders or bundles:
-        return [x[0] if len(x) == 1 else Bundle(x) for x in bundles]
+        for material, color_scheme in unique_properties:
+            bundles.extend(list(self.create_bundle(orders, material, color_scheme)))
+
+        return [bundle[0] if len(bundle) == 1 else Bundle(bundle) for bundle in bundles]
 
 
 def optimize_orders(
@@ -238,7 +284,7 @@ def optimize_orders(
     factory_settings: FactorySettings = factory_settings,
 ):
     machines = []
-    for x  in machine_names:
+    for x in machine_names:
         if x not in factory_settings.machine_types:
             raise ValueError(f"Invalid machine name: {x}")
         machines.append(
