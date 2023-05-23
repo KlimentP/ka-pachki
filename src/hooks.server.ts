@@ -21,12 +21,12 @@ import {
       } = await event.locals.supabase.auth.getSession();
       return session;
     };
-    if (event.url.pathname !== '/signup' && event.url.pathname !== '/login') {
-      const session = await event.locals.getSession();
-      if (!session) {
-        throw redirect(303, '/signup')
-      }
-    }
+    // if (event.url.pathname !== '/signup' && event.url.pathname !== '/login') {
+    //   const session = await event.locals.getSession();
+    //   if (!session) {
+    //     throw redirect(303, '/signup')
+    //   }
+    // }
     return resolve(event, {
       /**
        * There´s an issue with `filterSerializedResponseHeaders` not working when using `sequence`

@@ -17,8 +17,8 @@ export const load = async ({ fetch, data, depends, url }) => {
   const {
     data: { session }
   } = await supabase.auth.getSession();
-  if (!session && url.pathname !== '/signup' && url.pathname !== '/login') {
-    throw redirect(303, '/login');
-  }
+  // if (!session && url.pathname !== '/signup' && url.pathname !== '/login') {
+  //   throw redirect(303, '/login');
+  // }
   return { supabase, session };
 };
