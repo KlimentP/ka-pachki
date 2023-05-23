@@ -133,8 +133,8 @@
 			on:click={async () => {
 				error = null;
 				loading = true;
-				plan = availableMachines.filter(m => m.checked).reduce((obj, m) => {
-					return { ...obj, [m?.name]: [] };
+				plan = availableMachines.reduce((obj, m) => {
+					return { ...obj, [m]: [] };
 				}, {});
 
 				try {
