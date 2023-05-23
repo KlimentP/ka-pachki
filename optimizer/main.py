@@ -21,17 +21,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class MachineEmployee(BaseModel):
-    name: factory_settings.machine_types_literal
-    employee: str
+# class MachineEmployee(BaseModel):
+#     name: factory_settings.machine_types_literal
+#     employee: str
 
 @app.post("/optimize")
 async def root(
-    machines_employees: list[MachineEmployee],
+    machines: list[factory_settings.machine_types_literal],
     orders: list[Order],
     max_perm_size: Optional[int] = 3,
     dependencies=Depends(check_user),
 ):
-    opt = optimize_orders(machines_employees, orders, max_perm_size)
+    opt = optimize_orders(machines, orders, max_perm_size)
     return {k:v.items for k,v in opt.factory.machines.items()}
     # return {"machines": machines, "orders": orders}

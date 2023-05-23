@@ -1,13 +1,13 @@
 from itertools import permutations
 
 from factory import (
-    Employee,
+    # Employee,
     FactorySettings,
     Machine,
     Order,
     Factory,
     Bundle,
-    load_sample_orders,
+    # load_sample_orders,
     factory_settings,
     OrderNotFittingException,
 )
@@ -124,6 +124,7 @@ class OptimizerUtils:
     def get_threshold_duration(self, item: Bundle | Order):
         thresholds = {
             "butter": self.factory_settings.available_butter_time,
+            "uv_butter":  self.factory_settings.available_butter_time,
             "default": self.factory_settings.available_lid_time,
         }
         return thresholds.get(item.material, thresholds["default"])
@@ -135,16 +136,14 @@ class OptimizerUtils:
         ]
         for order in big_orders:
             theshold = self.get_threshold_duration(order)
-            order_count = order.minutes_length // theshold + 1
-            remainder = order.minutes_length % theshold
-            new_orders = [order.copy() for _ in range(order_count)]
-            for i, new_order in enumerate(new_orders):
-                new_order.id = f"{order.id}_{i}"
-                new_order.minutes_length = theshold
-            if remainder:
-                new_orders[-1].minutes_length = remainder
+            # order_count = order.minutes_length // theshold + 1
+            # remainder = order.minutes_length % theshold
+            new_order = order.copy()
+            new_order.minutes_length = theshold
+            # if remainder:
+            #     new_orders[-1].minutes_length = remainder
             orders.remove(order)
-            orders.extend(new_orders)
+            orders.append(new_order)
         return orders
 
     def sort_perms_by_machine(
@@ -232,33 +231,27 @@ class OptimizerUtils:
 
 
 def optimize_orders(
-    machine_employees: list[str],
+    machine_names: list[factory_settings.machine_types_literal],
     orders: list[Order],
     max_perm_size=4,
     optimizer_utils: OptimizerUtils = OptimizerUtils(),
     factory_settings: FactorySettings = factory_settings,
 ):
-    
     machines = []
-    for name in [x.name for x in machine_employees]:
-        if name not in factory_settings.machine_types:
-            raise ValueError(f"Invalid {name}")
+    for x  in machine_names:
+        if x not in factory_settings.machine_types:
+            raise ValueError(f"Invalid machine name: {x}")
         machines.append(
             Machine(
-                name,
+                x,
                 [],
-                factory_settings.machine_material_pairs[name]["acceptable_materials"],
-                factory_settings.machine_material_pairs[name]["urgent_materials"],
+                factory_settings.machine_material_pairs[x]["acceptable_materials"],
+                factory_settings.machine_material_pairs[x]["urgent_materials"],
             )
         )
 
     lengths = list(range(1, max_perm_size + 1))
 
-    employees = [
-        Employee("1", "Bobi",),
-        Employee("2", "Sasho",),
-        Employee("3", "Valter", ),
-    ]
     filtered_orders = optimizer_utils.narrow_down_orders(orders)
     brokendown_orders = optimizer_utils.break_down_big_orders(filtered_orders.copy())
     bundles = optimizer_utils.bundle_orders(brokendown_orders)
