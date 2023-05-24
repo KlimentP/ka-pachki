@@ -10,7 +10,7 @@ export const dbToAutocomplete = (items: {id: string | number, name:string}[])=>{
 
 export const  removeNullValues = (obj: {[key: string]: any | null | undefined}) => {
     return Object.entries(obj)
-      .filter(([_, value]) => value !== null && value !== undefined)
+      .filter(([_, value]) => value !== null && value !== undefined && value !== 'null' && value !== '')
       .reduce((newObj: {[key: string]: any}, [key, value]) => {
         newObj[key] = value;
         return newObj;

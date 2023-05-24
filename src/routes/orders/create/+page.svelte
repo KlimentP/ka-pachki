@@ -116,10 +116,11 @@
 				<select
 					class="select"
 					name="assigned_machine_id"
-					size="4"
+					size="0"
 					bind:value={$form.assigned_machine_id}
 					{...$constraints.assigned_machine_id}
 				>
+					<option value={null}>None - Use Default Machine</option>
 					{#each machineOptions as machine}
 						<option value={machine.value}>{machine.label}</option>
 					{/each}
@@ -128,38 +129,21 @@
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
-				<div class="relative">
+				<div class="flex gap-4 align-middle">
 					<label
-						class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+						class="block uppercase tracking-wide text-gray-700 text-xs font-bold"
 						for="urgent"
 					>
 						Urgent
 					</label>
-					<select
-						class="select"
+					<input
+						type="checkbox"
+						class="checkbox h-6 w-6"
 						id="urgent"
 						name="urgent"
 						bind:value={$form.urgent}
 						{...$constraints.urgent}
-					>
-						<option value="false">No</option>
-						<option value="true">Yes</option>
-					</select>
-					<div
-						class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-					>
-						<svg
-							class="fill-current h-4 w-4"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 20 20"
-						>
-							<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z"
-							/>
-						</svg>
-					</div>
+					/>
 				</div>
 			</div>
 		</div>

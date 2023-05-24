@@ -97,7 +97,7 @@ export const ordersRowSchema = z.object({
 });
 
 export const ordersInsertSchema = z.object({
-	assigned_machine_id: z.number().optional().nullable(),
+	assigned_machine_id: z.string().optional().nullable().default(null),
 	closed_by: z.string().optional().nullable(),
 	created_by: z.string().optional().nullable(),
 	customer_id: z.number().optional().nullable(),
