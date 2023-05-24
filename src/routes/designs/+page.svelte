@@ -9,7 +9,7 @@
 
 
 	</script>
-<div class="container h-full mx-auto flex">
+<div class="container h-full mx-auto flex justify-center">
 	<ItemList items={tableData} itemType="design" {form}>
 	<svelte:fragment let:item={item} slot="item-body">
 		<DesignItemBody {item} />
