@@ -93,7 +93,7 @@ export const ordersRowSchema = z.object({
 	quantity: z.number().nullable(),
 	status: z.string().nullable(),
 	units_already_produced: z.number(),
-	urgent: z.boolean()
+	urgent: z.boolean().default(false)
 });
 
 export const ordersInsertSchema = z.object({

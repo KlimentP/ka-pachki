@@ -25,7 +25,7 @@
 <div class="container h-full mx-auto flex flex-col gap-4 justify-center items-center max-sm:p-4">
 	<h2 class="mb-2">Create Order</h2>
 	<form class="w-full max-w-lg" method="POST" use:enhance>
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -37,7 +37,7 @@
 			</div>
 		</div>
 
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -48,7 +48,7 @@
 				<AutoCompleteSingle form={$form} options={designOptions} formName="design_id" />
 			</div>
 		</div>
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="qty">
 					Quantity
@@ -66,7 +66,7 @@
 			</div>
 		</div>
 
-		<!-- <div class="flex flex-wrap -mx-3 mb-6">
+		<!-- <div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -87,7 +87,7 @@
 				</select>
 			</div>
 		</div> -->
-		<!-- <div class="flex flex-wrap -mx-3 mb-6">
+		<!-- <div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -105,7 +105,7 @@
 				/>
 			</div>
 		</div> -->
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -126,7 +126,7 @@
 				</select>
 			</div>
 		</div>
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<div class="relative">
 					<label
@@ -163,7 +163,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -172,6 +172,7 @@
 					Deadline
 				</label>
 				<input
+					required
 					class="input"
 					id="deadline"
 					type="date"
@@ -181,7 +182,7 @@
 				/>
 			</div>
 		</div>
-		<div class="flex flex-wrap -mx-3 mb-6">
+		<div class="flex flex-wrap -mx-3 mb-4">
 			<div class="w-full px-3">
 				<label
 					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -206,7 +207,7 @@
 		{#if $message}
 			<aside
 				transition:fade|local={{ duration: 500 }}
-				class="alert"
+				class="alert mb-4"
 				class:variant-filled-success={$page.status < 400}
 				class:variant-filled-error={$page.status >= 400}
 			>
