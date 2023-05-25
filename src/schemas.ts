@@ -51,7 +51,9 @@ export const designsInsertSchema = z.object({
 	id: z.number().optional(),
 	material: z.string(),
 	name: z.string(),
-	preferred_machine_id: z.number().optional().nullable()
+	preferred_machine_id: z.number().optional().nullable(),
+	notes: z.string().optional().nullable(),
+
 });
 
 export const designsUpdateSchema = z.object({
@@ -112,7 +114,7 @@ export const ordersInsertSchema = z.object({
 	quantity: z.number().optional().nullable(),
 	status: z.string().optional().nullable().default('scheduled'),
 	units_already_produced: z.number().optional().default(0),
-	urgent: z.boolean().optional().default(false)
+	urgent: z.boolean().optional()
 });
 
 export const ordersUpdateSchema = z.object({

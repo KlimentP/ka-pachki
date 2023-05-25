@@ -6,6 +6,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { page } from '$app/stores';
 	export let data;
+	let resetAutoComplete = false;
 	const { form, errors, constraints, message, reset, enhance } = superForm(data.form, {
 		onUpdated({ form }) {
 			// Need to do this because messages can't be preserved on redirect.
@@ -13,6 +14,7 @@
 			// https://github.com/ciscoheat/sveltekit-flash-message
 			if (form.valid ) {
 				reset({ keepMessage: true });
+				resetAutoComplete = true;
 			}
 		}
 	});
@@ -33,7 +35,7 @@
 				>
 					Customer
 				</label>
-				<AutoCompleteSingle form={$form} options={customerOptions} formName="customer_id" />
+				<AutoCompleteSingle form={$form} options={customerOptions} formName="customer_id" reset={resetAutoComplete}/>
 			</div>
 		</div>
 
@@ -45,7 +47,7 @@
 				>
 					Design
 				</label>
-				<AutoCompleteSingle form={$form} options={designOptions} formName="design_id" />
+				<AutoCompleteSingle form={form} options={designOptions} formName="design_id" reset={resetAutoComplete} />
 			</div>
 		</div>
 		<div class="flex flex-wrap -mx-3 mb-4">
@@ -141,7 +143,7 @@
 						class="checkbox h-6 w-6"
 						id="urgent"
 						name="urgent"
-						bind:value={$form.urgent}
+						bind:checked={$form.urgent}
 						{...$constraints.urgent}
 					/>
 				</div>

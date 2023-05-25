@@ -118,6 +118,23 @@
 					>{$errors.preferred_machine_id}</span
 				>{/if}
 		</div>
+		<div class="flex flex-wrap -mx-3 mb-4">
+			<div class="w-full px-3">
+				<label
+					class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+					for="notes"
+				>
+					Notes
+				</label>
+				<textarea
+					class="textarea"
+					id="notes"
+					name="notes"
+					bind:value={$form.notes}
+					{...$constraints.notes}
+				/>
+			</div>
+		</div>
 		{#if Object.keys($errors).length > 0}
 			<aside class="alert variant-filled-error p-4" transition:fade|local={{ duration: 500 }}>
 				{JSON.stringify($errors)}

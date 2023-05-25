@@ -14,8 +14,11 @@
 					{#if item?.machines?.name}
 						<div class="font-bold text-slate-800">Preferred Machine:</div>
 						<span class="text-slate-800">{item?.machines?.name || 'None'}</span>
+						{/if}
+					</div>
+					{#if item?.notes}
+					<div class="text-slate-800">{item?.notes || 'None'}</div>
 					{/if}
-				</div>
 			</section>
 		</div>
 
