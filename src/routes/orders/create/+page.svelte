@@ -14,7 +14,7 @@
 			// https://github.com/ciscoheat/sveltekit-flash-message
 			if (form.valid ) {
 				reset({ keepMessage: true });
-				resetAutoComplete = true;
+				resetAutoComplete = !resetAutoComplete;
 			}
 		}
 	});

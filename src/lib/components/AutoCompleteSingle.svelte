@@ -12,9 +12,9 @@
 	// 	input = '';
 	// }
 	
-	$: if (reset) {
+	$: {
+		reset = reset;
 		input = '';
-		reset = false;
 	}
 	export let options: AutocompleteOption[] = [];
 	function onSelection(event: any): void {
