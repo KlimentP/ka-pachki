@@ -48,18 +48,15 @@ class FactorySettings(BaseSettings):
     machine_material_pairs = {
         "butter": {
             "acceptable_materials": ["butter", "lid"],
-            "urgent_materials": ["butter"],
         },
         "label": {
             "acceptable_materials": ["label", "lid", "uv_butter"],
-            "urgent_materials": ["label", "uv_butter"],
         },
         "embossed_lid": {
             "acceptable_materials": ["embossed_lid", "lid"],
-            "urgent_materials": ["embossed_lid", "lid"],
         },
     }
-    specific_types = [x for x in material_types if x != "lid"]
+    specific_material_types = [x for x in material_types if x != "lid"]
     base_switch: int = 20
     color_switch: int = 5
     lid_to_butter_switch: int = 120
@@ -89,7 +86,7 @@ class Order(BaseModel):
     minutes_length: int | None
     days_remaining: int | None = None
     urgent: bool
-    machine: factory_settings.machine_types_literal | None = None # type: ignore
+    machine: factory_settings.machine_types_literal | None = None  # type: ignore
     status: str  # TODO add enum
 
     class Config:
@@ -115,11 +112,12 @@ class Bundle:
     orders: list[Order]
     minutes_length: int = Field(init=False)
     material: factory_settings.material_types_literal = Field(init=False)  # type: ignore
-    days_remaining: int = Field(init=False)
+    machine: factory_settings.machine_types_literal = Field(init=False)  # type: ignore
+
     def __post_init__(self):
         self.minutes_length = sum(x.minutes_length for x in self.orders)
         self.material = self.orders[0].material
-        
+        self.machine = self.orders[0].machine
 
     def process(self, machine):
         machine.multiple_orders(self.orders)
@@ -140,7 +138,7 @@ class Machine:
     items: list[Order | DownTime]
     # operating_employees: list[Employee]
     acceptable_materials: list[factory_settings.machine_types_literal]  # type: ignore
-    urgent_materials: list[factory_settings.machine_types_literal]  # type: ignore
+    specific_materials: list[factory_settings.machine_types_literal] = Field(init=False)  # type: ignore
     capacity_minutes: int = factory_settings.total_time
     tolerance: float = factory_settings.tolerance
     full: bool = False
@@ -148,8 +146,12 @@ class Machine:
     available_minutes = capacity_minutes
 
     def __post_init__(self):
+        self.specific_materials = [
+            x
+            for x in self.acceptable_materials
+            if x in factory_settings.specific_material_types
+        ]
         self.initialize_cleanups()
-    
 
     def initialize_cleanups(self):
         self.add_down_time(factory_settings.start_cleanup, initial=True)
