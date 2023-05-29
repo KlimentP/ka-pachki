@@ -19,7 +19,7 @@
 	// });
 	const orderOptions = formatOrderOptions(orders);
 	let selectedOrders = orders;
-
+	let maxPermSize = 3;
 
 	const machineOptions: { [K in Machine]: string } = {
 		butter: 'Butter',
@@ -32,9 +32,9 @@
 		butter: 'fluent-emoji-high-contrast:butter'
 	};
 
-	const machines = Object.keys(machineOptions)
+	const machines = Object.keys(machineOptions);
 	let availableMachines = machines;
-	console.log(machines, availableMachines)
+	console.log(machines, availableMachines);
 
 	let loading = false;
 	let plan: any = {};
@@ -58,8 +58,8 @@
 	</header>
 	<div class="flex flex-col gap-4 p-4">
 		<div class="grid grid-cols-2 flex-row flex-wrap gap-8 justify-center">
-			<section class="col-span-2 card card-hover shadow-lg rounded-md px-4 pb-4 h-96 overflow-auto">
-				<div class=" flex gap-4 sticky top-0 text-2xl text-slate-800 bg-inherit py-2 align-middle">
+			<section class="col-span-2 card card-hover shadow-lg rounded-md px-4 pb-4 h-[480px] overflow-auto">
+				<div class=" flex gap-4 sticky top-0 text-2xl text-slate-800 bg-inherit py-4 align-middle">
 					<input
 						class="checkbox h-6 w-6 self-center"
 						type="checkbox"
@@ -70,7 +70,7 @@
 				</div>
 				{#each orderOptions as order}
 					<label
-						class="flex items-center space-x-2 tracking-wide my-2"
+						class="flex items-center space-x-2 tracking-wide mb-2"
 						class:!bg-amber-300={order.value?.urgent}
 					>
 						<input
@@ -97,59 +97,64 @@
 					</label>
 				{/each}
 			</section> -->
-			<section class="col-span-2 card card-hover flex flex-col rounded-md pb-2 px-4">
+			<div
+				class="col-span-2 w-full flex flex-col gap-2 justify-between card card-hover rounded-md p-4"
+			>
 				<!-- <div class="flex gap-16 md:gap-48 align-middle py-2"> -->
-					<div class=" text-2xl text-slate-800">Machines Available</div>
-					<!-- <p class="text-slate-800 hover:text-primary-500 w-36 self-center">Assigned Employee</p> -->
+				<!-- <p class="text-slate-800 hover:text-primary-500 w-36 self-center">Assigned Employee</p> -->
 
 				<!-- </div> -->
-				<div class="flex flex-col gap-2">
-					{#each machines as machine}
-						<div class="flex justify-between items-center border-b-2 pb-2 border-slate-400 hover:border-primary-500">
-							<label class="flex gap-2">
-								<input
-									class="checkbox"
-									bind:group={availableMachines}
-									checked
-									value={machine}
-									type="checkbox"
-								/>
-								<p class="text-slate-800 w-36">{machineOptions[machine]}</p>
-							</label>
-							<!-- <select
-								class="select max-w-xs !max-h-12" bind:value={machine.employee}
-							>
-								{#each employeeOptions as employee}
-									<option class=""  >{employee.label}</option>
-							
-								{/each}
-							</select> -->
+				<div class="flex gap-4 justify-between align-top">
+					<div class="flex flex-col gap-2">
+						<div class="text-2xl text-slate-800">Machines Available</div>
+						<div class="flex gap-2">
+							{#each machines as machine}
+								<div class="flex items-center hover:border-b-2 hover:border-primary-500">
+									<label class="flex gap-2">
+										<input
+											class="checkbox"
+											bind:group={availableMachines}
+											checked
+											value={machine}
+											type="checkbox"
+										/>
+										<p class="text-slate-800">{machineOptions[machine]}</p>
+									</label>
+								</div>
+							{/each}
 						</div>
-					{/each}
+					</div>
+					<div class="">
+						<p>Maximum Combination Size</p>
+						<select class="select" id="max_perm_size" name="max_perm_size" bind:value={maxPermSize}>
+							{#each [1, 2, 3, 4, 5, 6] as size}
+								<option value={size}>{size}</option>
+							{/each}
+						</select>
+					</div>
+					<button
+						on:click={async () => {
+							error = null;
+							loading = true;
+							plan = availableMachines.reduce((obj, m) => {
+								return { ...obj, [m]: [] };
+							}, {});
+							try {
+								plan = await generatePlan(availableMachines, selectedOrders, maxPermSize);
+							} catch (err) {
+								error = 'Could not generate plan';
+							}
+							loading = false;
+							const results = document.getElementById('planner-results');
+							results?.scrollIntoView({ behavior: 'smooth' });
+						}}
+						class="btn bg-secondary-500 text-white font-bold h-12 self-center"
+					>
+						Generate Schedule
+					</button>
 				</div>
-			</section>
+			</div>
 		</div>
-		<button
-			on:click={async () => {
-				error = null;
-				loading = true;
-				plan = availableMachines.reduce((obj, m) => {
-					return { ...obj, [m]: [] };
-				}, {});
-
-				try {
-					plan = await generatePlan(availableMachines, selectedOrders);
-				} catch (err) {
-					error = 'Could not generate plan';
-				}
-				loading = false;
-				const results = document.getElementById('planner-results');
-				results?.scrollIntoView({ behavior: 'smooth' });
-			}}
-			class="btn bg-secondary-500 text-white font-bold"
-		>
-			Generate Schedule
-		</button>
 	</div>
 	<section
 		id="planner-results"
