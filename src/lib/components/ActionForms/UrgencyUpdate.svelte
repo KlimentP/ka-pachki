@@ -3,7 +3,6 @@
 	import BaseActionForm from './BaseActionForm.svelte';
 	const { selectedOrder } = $modalStore[0].meta;
 	export let action: string;
-    console.log(123, selectedOrder)
 </script>
 
 <BaseActionForm {action}>

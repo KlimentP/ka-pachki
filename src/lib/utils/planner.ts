@@ -29,7 +29,6 @@ export const generatePlan = async (
 			})
 		});
 	} catch (error) {
-		console.log(error);
 		throw new Error('Error generating plan');
 	}
 	return await res.json();

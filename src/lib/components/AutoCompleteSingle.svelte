@@ -7,11 +7,6 @@
 	;
 	let input = '';
 
-	// console.log(formName, form)
-	// if (!form[formName]) {
-	// 	input = '';
-	// }
-	
 	$: {
 		reset = reset;
 		input = '';

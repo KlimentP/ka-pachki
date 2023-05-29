@@ -28,14 +28,11 @@
 	};
 
 	if (form?.error) {
-		console.log('error');
-
 		toastStore.trigger({
 			message: `Error: ${form.error}`,
 			background: 'bg-red-500'
 		});
 	} else if (form?.message) {
-		console.log('deleted');
 		toastStore.trigger({
 			message: `Success: ${form.message}`,
 			background: 'bg-green-500'
