@@ -47,3 +47,12 @@ PUBLIC_SUPABASE_ANON_KEY
 ```
 To skip unnecessary builds, add optimizer dir to ```.vercelignore```
 And also in settings/git, add the following: ```git diff --quiet HEAD^ HEAD ./ ':(exclude)optimizer'```
+
+
+## Generating Types
+
+Supabase Types:
+npx supabase gen types typescript --project-id "PROJECT_ID" --schema public > src/supabase.ts
+
+Generate Zod Types from Supabase Types:
+pnpm supabase-to-zod --input src/supabase.ts --output src/schemas.ts

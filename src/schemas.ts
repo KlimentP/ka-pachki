@@ -43,17 +43,17 @@ export const designsRowSchema = z.object({
 	id: z.number(),
 	material: z.string(),
 	name: z.string(),
+	notes: z.string().nullable(),
 	preferred_machine_id: z.number().nullable()
 });
 
 export const designsInsertSchema = z.object({
-	color_scheme: z.array(z.string()).min(2).max(6),
+	color_scheme: z.array(z.string()),
 	id: z.number().optional(),
 	material: z.string(),
 	name: z.string(),
-	preferred_machine_id: z.number().optional().nullable(),
 	notes: z.string().optional().nullable(),
-
+	preferred_machine_id: z.number().optional().nullable()
 });
 
 export const designsUpdateSchema = z.object({
@@ -61,26 +61,126 @@ export const designsUpdateSchema = z.object({
 	id: z.number().optional(),
 	material: z.string().optional(),
 	name: z.string().optional(),
+	notes: z.string().optional().nullable(),
 	preferred_machine_id: z.number().optional().nullable()
 });
 
-export const machinesRowSchema = z.object({
+export const designsBupRowSchema = z.object({
+	color_scheme: z.array(z.string()).nullable(),
+	id: z.number().nullable(),
+	material: z.string().nullable(),
+	name: z.string().nullable(),
+	preferred_employee_id: z.number().nullable()
+});
+
+export const designsBupInsertSchema = z.object({
+	color_scheme: z.array(z.string()).optional().nullable(),
+	id: z.number().optional().nullable(),
+	material: z.string().optional().nullable(),
+	name: z.string().optional().nullable(),
+	preferred_employee_id: z.number().optional().nullable()
+});
+
+export const designsBupUpdateSchema = z.object({
+	color_scheme: z.array(z.string()).optional().nullable(),
+	id: z.number().optional().nullable(),
+	material: z.string().optional().nullable(),
+	name: z.string().optional().nullable(),
+	preferred_employee_id: z.number().optional().nullable()
+});
+
+export const employeesRowSchema = z.object({
+	default_machine: z.number().nullable(),
 	id: z.number(),
 	name: z.string()
 });
 
-export const machinesInsertSchema = z.object({
+export const employeesInsertSchema = z.object({
+	default_machine: z.number().optional().nullable(),
 	id: z.number().optional(),
 	name: z.string()
 });
 
-export const machinesUpdateSchema = z.object({
+export const employeesUpdateSchema = z.object({
+	default_machine: z.number().optional().nullable(),
 	id: z.number().optional(),
 	name: z.string().optional()
 });
 
+export const machinesRowSchema = z.object({
+	id: z.number(),
+	name: z.string().nullable()
+});
+
+export const machinesInsertSchema = z.object({
+	id: z.number().optional(),
+	name: z.string().optional().nullable()
+});
+
+export const machinesUpdateSchema = z.object({
+	id: z.number().optional(),
+	name: z.string().optional().nullable()
+});
+
 export const ordersRowSchema = z.object({
 	assigned_machine_id: z.number().nullable(),
+	closed_by: z.string().nullable(),
+	created_by: z.string(),
+	customer_id: z.number().nullable(),
+	date_closed: z.string().nullable(),
+	date_created: z.string().nullable(),
+	date_updated: z.string().nullable(),
+	deadline: z.string().nullable(),
+	design_id: z.number().nullable(),
+	duration_order: z.number().nullable(),
+	id: z.string(),
+	notes: z.string().nullable(),
+	quantity: z.number().nullable(),
+	status: z.string().nullable(),
+	units_already_produced: z.number(),
+	urgent: z.boolean()
+});
+
+export const ordersInsertSchema = z.object({
+	assigned_machine_id: z.number().optional().nullable(),
+	closed_by: z.string().optional().nullable(),
+	created_by: z.string(),
+	customer_id: z.number().optional().nullable(),
+	date_closed: z.string().optional().nullable(),
+	date_created: z.string().optional().nullable(),
+	date_updated: z.string().optional().nullable(),
+	deadline: z.string().optional().nullable(),
+	design_id: z.number().optional().nullable(),
+	duration_order: z.number().optional().nullable(),
+	id: z.string().optional(),
+	notes: z.string().optional().nullable(),
+	quantity: z.number().optional().nullable(),
+	status: z.string().optional().nullable(),
+	units_already_produced: z.number().optional(),
+	urgent: z.boolean().optional()
+});
+
+export const ordersUpdateSchema = z.object({
+	assigned_machine_id: z.number().optional().nullable(),
+	closed_by: z.string().optional().nullable(),
+	created_by: z.string().optional(),
+	customer_id: z.number().optional().nullable(),
+	date_closed: z.string().optional().nullable(),
+	date_created: z.string().optional().nullable(),
+	date_updated: z.string().optional().nullable(),
+	deadline: z.string().optional().nullable(),
+	design_id: z.number().optional().nullable(),
+	duration_order: z.number().optional().nullable(),
+	id: z.string().optional(),
+	notes: z.string().optional().nullable(),
+	quantity: z.number().optional().nullable(),
+	status: z.string().optional().nullable(),
+	units_already_produced: z.number().optional(),
+	urgent: z.boolean().optional()
+});
+
+export const ordersBupRowSchema = z.object({
+	assigned_employee_id: z.number().nullable(),
 	closed_by: z.string().nullable(),
 	created_by: z.string().nullable(),
 	customer_id: z.number().nullable(),
@@ -90,16 +190,16 @@ export const ordersRowSchema = z.object({
 	deadline: z.string().nullable(),
 	design_id: z.number().nullable(),
 	duration_order: z.number().nullable(),
+	id: z.string().nullable(),
 	notes: z.string().nullable(),
-	id: z.string(),
 	quantity: z.number().nullable(),
 	status: z.string().nullable(),
-	units_already_produced: z.number(),
-	urgent: z.boolean().default(false)
+	units_already_produced: z.number().nullable(),
+	urgent: z.boolean().nullable()
 });
 
-export const ordersInsertSchema = z.object({
-	assigned_machine_id: z.string().optional().nullable().default(null),
+export const ordersBupInsertSchema = z.object({
+	assigned_employee_id: z.number().optional().nullable(),
 	closed_by: z.string().optional().nullable(),
 	created_by: z.string().optional().nullable(),
 	customer_id: z.number().optional().nullable(),
@@ -109,40 +209,44 @@ export const ordersInsertSchema = z.object({
 	deadline: z.string().optional().nullable(),
 	design_id: z.number().optional().nullable(),
 	duration_order: z.number().optional().nullable(),
+	id: z.string().optional().nullable(),
 	notes: z.string().optional().nullable(),
-	id: z.string().optional(),
-	quantity: z.number().optional().nullable(),
-	status: z.string().optional().nullable().default('scheduled'),
-	units_already_produced: z.number().optional().default(0),
-	urgent: z.boolean().optional()
-});
-
-export const ordersUpdateSchema = z.object({
-	assigned_machine_id: z.number().optional().nullable(),
-	closed_by: z.string().optional().nullable(),
-	created_by: z.string().optional().nullable(),
-	customer_id: z.number().optional().nullable(),
-	date_closed: z.string().optional().nullable(),
-	date_created: z.string().optional().nullable(),
-	date_updated: z.string().optional().nullable(),
-	deadline: z.string().optional().nullable(),
-	design_id: z.number().optional().nullable(),
-	duration_order: z.number().optional().nullable(),
-	notes: z.string().optional().nullable(),
-	id: z.string().optional(),
 	quantity: z.number().optional().nullable(),
 	status: z.string().optional().nullable(),
-	units_already_produced: z.number().optional(),
-	urgent: z.boolean().optional()
+	units_already_produced: z.number().optional().nullable(),
+	urgent: z.boolean().optional().nullable()
+});
+
+export const ordersBupUpdateSchema = z.object({
+	assigned_employee_id: z.number().optional().nullable(),
+	closed_by: z.string().optional().nullable(),
+	created_by: z.string().optional().nullable(),
+	customer_id: z.number().optional().nullable(),
+	date_closed: z.string().optional().nullable(),
+	date_created: z.string().optional().nullable(),
+	date_updated: z.string().optional().nullable(),
+	deadline: z.string().optional().nullable(),
+	design_id: z.number().optional().nullable(),
+	duration_order: z.number().optional().nullable(),
+	id: z.string().optional().nullable(),
+	notes: z.string().optional().nullable(),
+	quantity: z.number().optional().nullable(),
+	status: z.string().optional().nullable(),
+	units_already_produced: z.number().optional().nullable(),
+	urgent: z.boolean().optional().nullable()
+});
+
+export const colorOptionsRowSchema = z.object({
+	name: z.string().nullable()
 });
 
 export const ordersFullRowSchema = z.object({
-	// assigned_machine_id: z.number().nullable(),
+	assigned_machine_id: z.number().nullable(),
 	closed_by: z.string().nullable(),
 	closed_by_email: z.string().nullable(),
 	color_scheme: z.array(z.string()).nullable(),
-	created_by_email: z.string().nullable(),
 	created_by: z.string().nullable(),
+	created_by_email: z.string().nullable(),
 	customer_id: z.number().nullable(),
 	customer_name: z.string().nullable(),
 	date_closed: z.string().nullable(),
@@ -152,11 +256,10 @@ export const ordersFullRowSchema = z.object({
 	design_id: z.number().nullable(),
 	design_name: z.string().nullable(),
 	duration_order: z.number().nullable(),
+	id: z.string().nullable(),
+	machine: z.string().nullable(),
 	material: z.string().nullable(),
 	notes: z.string().nullable(),
-	id: z.string().nullable(),
-	machine: z.string(),
-	// preferred_machine_id_name: z.string().nullable(),
 	quantity: z.number().nullable(),
 	status: z.string().nullable(),
 	units_already_produced: z.number().nullable(),
