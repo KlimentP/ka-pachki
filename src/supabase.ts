@@ -11,12 +11,15 @@ export interface Database {
     Tables: {
       colors: {
         Row: {
+          code: string | null
           name: string
         }
         Insert: {
+          code?: string | null
           name: string
         }
         Update: {
+          code?: string | null
           name?: string
         }
       }

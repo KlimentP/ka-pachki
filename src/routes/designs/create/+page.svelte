@@ -64,7 +64,7 @@
 				>
 					Color Scheme
 				</label>
-				<AutoCompleteMulti form={$form} options={colorOptions} formName="color_scheme" />
+				<AutoCompleteMulti form={$form} options={colorOptions} formName="color_scheme" allowlist={colorOptions.map(c => c?.value)} />
 			</div>
 			{#if $errors.color_scheme}<span class="text-error-500">{$errors.color_scheme}</span>{/if}
 		</div>

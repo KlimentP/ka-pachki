@@ -35,16 +35,18 @@
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
-	const resources = ['customers', 'designs', 'orders']
+	const resources = ['customers', 'designs', 'orders', 'colors']
 
 	const dropdowns = {};
 
 	resources.forEach(( name ) => {
 		dropdowns[name] = [
-			{ url: `/${name}/create`, label: 'Create' },
-			{ url: `/${name}`, label: 'View' }
+			{ url: `/${name}/create`, label: `Add ${name}` },
+			{ url: `/${name}`, label: `View ${name}` }
 		];
 	});
+	dropdowns["designs"] = [...dropdowns["designs"], ...dropdowns["colors"]];
+	delete dropdowns["colors"];
 	
 </script>
 

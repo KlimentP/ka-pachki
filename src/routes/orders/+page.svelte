@@ -9,7 +9,7 @@
 	import ColorScheme from '$lib/components/ColorScheme.svelte';
 
 	export let data: PageData;
-	let { tableData, machines } = data;
+	let { tableData, machines, colors } = data;
 	// let filter = '';
 	// let filteredData = tableData;
 	const keysToFilter = [
@@ -91,7 +91,7 @@
 							{#if key === 'material'}
 								<td class="align-middle"><Material material={value} toolTip={false} /> </td>
 							{:else if key === 'color_scheme'}
-								<td class="!text-xs"><ColorScheme colors={value} /></td>
+								<td class="!text-xs"><ColorScheme colors={value} colorMap={colors}/></td>
 							{:else if key === 'urgent'}
 								{#if value}
 									<td class="flex align-middle text-xs text-rose-700 font-bold"

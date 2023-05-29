@@ -10,7 +10,7 @@
 
 	export let data;
 
-	let { orders } = data;
+	let { orders, colors } = data;
 	// let employeeOptions = employees.map((e) => {
 	// 	return {
 	// 		label: e?.name,
@@ -34,7 +34,6 @@
 
 	const machines = Object.keys(machineOptions);
 	let availableMachines = machines;
-	console.log(machines, availableMachines);
 
 	let loading = false;
 	let plan: any = {};
@@ -42,7 +41,6 @@
 
 	const handleSelectAll = (event: any) => {
 		if (event.target.checked) {
-			console.log('checked');
 			selectedOrders = orders;
 		} else {
 			selectedOrders = [];
@@ -187,7 +185,7 @@
 											description=""
 										>
 											<div slot="icon">{index + 1}</div>
-											<ColorScheme colors={v.color_scheme ?? []} />
+											<ColorScheme colors={v.color_scheme ?? []} colorMap={colors} />
 											<div class="flex flex-row gap-2">
 												<div class="text-lg text-slate-800 font-bold">Material:</div>
 												<div class="self-center">

@@ -7,7 +7,9 @@ export async function load({ locals }) {
     const {data} = await supabase
     .from(resource)
     .select('*, machines (name)' )
-    return {tableData: data ?? [],};
+
+    const {data: colors} = await supabase.from('colors').select('*');
+    return {tableData: data ?? [], colors: colors ?? []};
 }
 
 export const actions = {

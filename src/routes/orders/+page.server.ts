@@ -7,7 +7,8 @@ const deleteOrder = handleDelete(resource);
 export async function load({ locals }) {
 	const { data } = await locals.supabase.from('orders_full').select('*').order('date_created', { ascending: false });
 	const { data: machines } = await locals.supabase.from('machines').select('name,id');
-	return { tableData: data ?? [], machines: machines ?? [] };
+	const {data: colors} = await locals.supabase.from('colors').select('*');
+	return { tableData: data ?? [], machines: machines ?? [], colors: colors ?? [] };
 }
 
 export const actions = {
