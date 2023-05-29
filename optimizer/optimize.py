@@ -66,27 +66,33 @@ class PermOptimizer:
                 self.factory.add_multiple_orders(orders_flat, machine_name)
             # if the perm doesn't fit, dont consider it for optimal solution:
             except (OrderNotFittingException, ValueError):
-                    continue
+                continue
             if machine.available_minutes >= -machine.tolerance:
                 if machine.idle_time < min_idle_time:
                     min_idle_time = machine.idle_time
                     best_fit = {
                         "idle_time": min_idle_time,
                         "perm": machine.items.copy(),
-                        "avg_days_remaining": self.calc_weighted_perm_urgency(orders_flat)
+                        "avg_days_remaining": self.calc_weighted_perm_urgency(
+                            orders_flat
+                        ),
                     }
                 elif machine.idle_time == min_idle_time:
                     avg_days_remaining = self.calc_weighted_perm_urgency(orders_flat)
-                    print(avg_days_remaining, "avg days remaining, current best:", best_fit["avg_days_remaining"])
+                    # print(
+                    #     avg_days_remaining,
+                    #     "avg days remaining, current best:",
+                    #     best_fit["avg_days_remaining"],
+                    # )
                     if avg_days_remaining < best_fit["avg_days_remaining"]:
                         best_fit = {
                             "idle_time": min_idle_time,
                             "perm": machine.items.copy(),
-                            "avg_days_remaining": avg_days_remaining
+                            "avg_days_remaining": avg_days_remaining,
                         }
             self.factory.clear_orders([machine_name])
         # re-add once we know the best perm
-        if best_fit:
+        if len(best_fit) > 1:
             self.factory.set_schedule(
                 best_fit["perm"], best_fit["idle_time"], machine_name  # type: ignore
             )
@@ -97,7 +103,9 @@ class PermOptimizer:
     def fit_perms_factory(self) -> None:
         min_idle_time: float = self.min_idle_time * len(self.factory.machines)
         best_fit = {}
-        machine_perms = permutations(self.factory.machines)
+        # machine_perms = permutations(self.factory.machines)
+        machine_perms = [self.factory.machines]  # TODO revert when done testing
+
         for mp in machine_perms:
             temp_fit = {}
             for machine in mp:
@@ -195,41 +203,89 @@ class OptimizerUtils:
         """
         perms_by_machine = {x.name: [] for x in machines}  # type: ignore
         urgent_orders = urgent_orders or []
-
+        urgent_lids, urgent_non_lids = [], []
+        for o in urgent_orders:
+            if o.material == "lid":
+                urgent_lids.append(o)
+            else:
+                urgent_non_lids.append(o)
+        urgent_orders_dict = {
+            m.name: self.get_urgent_orders_for_machine(m, urgent_non_lids)
+            for m in machines
+        }
+        for urg_lid in urgent_lids:
+            fewest_urgents_machine = min(
+                urgent_orders_dict,
+                key=lambda x: sum(y.minutes_length for y in urgent_orders_dict[x]),
+            )
+            # print("urg_lid", urg_lid, fewest_urgents_machine)
+            urgent_orders_dict[fewest_urgents_machine].append(urg_lid)
+        # print(urgent_orders_dict)
         for machine in machines:
-            if urgent_for_machine := self.get_urgent_orders_for_machine(
-                machine, urgent_orders
-            ):
+            if urgent_orders_dict[machine.name]:
+                print(machine.name)
                 perms_by_machine[machine.name] = self.get_perms_for_machine(
-                    perms, urgent_for_machine, max_perm_size
+                    perms, urgent_orders_dict[machine.name], max_perm_size
                 )
             else:
                 perms_by_machine[
                     machine.name
                 ] = self.get_perms_for_machine_without_urgent(perms, machine)
-
         return perms_by_machine
 
     def get_urgent_orders_for_machine(
         self, machine: Machine, urgent_orders: list[Order]
     ) -> list[Order]:
-        return [x for x in urgent_orders if x.material in machine.urgent_materials]
+        return [
+            x
+            for x in urgent_orders
+            if x.material in machine.specific_materials or x.machine == machine.name
+        ]
+
+    @staticmethod
+    def check_order_in_perm(order: Order, perm: list[Bundle | Order]) -> bool:
+        for x in perm:
+            if x == order:
+                return True
+            elif isinstance(x, Bundle) and order in x.orders:
+                return True
+        return False
 
     def get_perms_for_machine(self, perms, urgent_for_machine, max_perm_size):
+        # print(urgent_for_machine, perms)
+
         if len(urgent_for_machine) == max_perm_size:
             return [urgent_for_machine]
-        return [x for x in perms if all(y in x for y in urgent_for_machine)]
+        return [
+            x
+            for x in perms
+            if all(self.check_order_in_perm(y, x) for y in urgent_for_machine)
+        ]
 
     def get_perms_for_machine_without_urgent(self, perms, machine):
         perms_for_machine = []
         for perm in perms:
+            match = True
             for order in perm:
+                # if we have a single order that is dedicated to another machine, t
+                # hen we skip this perm:
+                if order.machine and order.machine != machine.name:
+                    match = False
+                    break
+                # if we have lids, or the material is acceptable for the machine,
+                # or the order is dedicated to the machine, then do not reject:
                 if (
                     order.material == "lid"
                     or order.material in machine.acceptable_materials
+                    or order.machine == machine.name
                 ):
-                    perms_for_machine.append(perm)
+                    pass
+                # otherwise, reject:
+                else:
+                    match = False
                     break
+            if match:
+                perms_for_machine.append(perm)
         return perms_for_machine
 
     def get_unique_properties(self, orders: list[Order]) -> list[tuple]:
@@ -289,10 +345,11 @@ def optimize_orders(
             raise ValueError(f"Invalid machine name: {x}")
         machines.append(
             Machine(
-                x,
-                [],
-                factory_settings.machine_material_pairs[x]["acceptable_materials"],
-                factory_settings.machine_material_pairs[x]["urgent_materials"],
+                name=x,
+                items=[],
+                acceptable_materials=factory_settings.machine_material_pairs[x][
+                    "acceptable_materials"
+                ],
             )
         )
 
@@ -300,9 +357,13 @@ def optimize_orders(
 
     filtered_orders = optimizer_utils.narrow_down_orders(orders)
     brokendown_orders = optimizer_utils.break_down_big_orders(filtered_orders.copy())
+    urgent_orders = [x for x in brokendown_orders if x.urgent]
     bundles = optimizer_utils.bundle_orders(brokendown_orders)
     perms = get_all_perms(bundles, lengths, parallel=True)
-    perm_by_machine = optimizer_utils.sort_perms_by_machine(perms, machines)
+    # print(len(perms))
+    perm_by_machine = optimizer_utils.sort_perms_by_machine(
+        perms, machines, urgent_orders
+    )
     # Define the batch size for permutations of length 6
 
     factory = Factory({m.name: m for m in machines})

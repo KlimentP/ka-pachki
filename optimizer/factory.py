@@ -61,6 +61,13 @@ class FactorySettings(BaseSettings):
     color_switch: int = 5
     lid_to_butter_switch: int = 120
     same_material_switch: int = 0
+    material_groups = {
+        "butter": "butter",
+        "uv_butter": "butter",
+        "label": "label",
+        "embossed_lid": "lid",
+        "lid": "lid",
+    }
 
 
 factory_settings = FactorySettings()
@@ -83,6 +90,7 @@ class Order(BaseModel):
     units_already_produced: int
     deadline: str | None
     material: factory_settings.material_types_literal  # type: ignore
+    material_group: None | str = None
     minutes_length: int | None
     days_remaining: int | None = None
     urgent: bool
@@ -97,6 +105,7 @@ class Order(BaseModel):
         values["computed_color_scheme"] = [
             x if x != "P Custom" else uuid4() for x in values["color_scheme"]
         ]
+        values["material_group"] = factory_settings.material_groups[values["material"]]
         return values
 
     def process(self, machine):
@@ -182,11 +191,12 @@ class Machine:
         own, other = set(order1.color_scheme), set(order2.color_scheme)
         diff = (own | other) - (own & other)
         color_diff = len(diff) * switch_settings.color_switch
-        material_diff = switch_settings.same_material_switch
-
+        if order1.material_group == order2.material_group:
+            material_diff = switch_settings.same_material_switch
         # this handles butter and uv_butter:
-        if any("butter" in x for x in (order1.material, order2.material)):
+        else:
             material_diff = switch_settings.lid_to_butter_switch
+
         return switch_settings.base_switch + color_diff + material_diff
 
     def add_item(self, item: Processable) -> None:

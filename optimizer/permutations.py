@@ -7,7 +7,7 @@ from factory import Order, factory_settings
 
 # TODO think about this combo of material and employee
 def conditional_perm(
-    p: list[Order], specific_materials=factory_settings.material_types # TODO change back to specific types
+    p: list[Order], specific_materials=factory_settings.specific_material_types
 ) -> bool:  # sourcery skip: use-named-expression
     sum_mins = sum(x.minutes_length for x in p)
 
@@ -26,7 +26,7 @@ def conditional_perm(
     if len(p) == 1:
         return True
     spec_materials = {o.material for o in p if o.material in specific_materials}
-    return len(spec_materials) <= 1
+    return len(spec_materials) <= 1 #TODO this will have to change if we include labels
 
 
 def temp(p: list[Order]) -> list[Order] | None:
