@@ -46,6 +46,17 @@
 			selectedOrders = [];
 		}
 	};
+	const makePlan = async () => {
+		loading = true;
+		plan = {};
+		error = null;
+		try {
+			plan = await generatePlan(availableMachines, selectedOrders, maxPermSize);
+		} catch (e) {
+			error = e;
+		}
+		loading = false;
+	};
 </script>
 
 <div class="container h-full w-full mx-auto flex flex-col gap-4 py-4 max-sm:px-2 items-center">
@@ -131,21 +142,7 @@
 						</select>
 					</div>
 					<button
-						on:click={async () => {
-							error = null;
-							loading = true;
-							plan = availableMachines.reduce((obj, m) => {
-								return { ...obj, [m]: [] };
-							}, {});
-							try {
-								plan = await generatePlan(availableMachines, selectedOrders, maxPermSize);
-							} catch (err) {
-								error = 'Could not generate plan';
-							}
-							loading = false;
-							const results = document.getElementById('planner-results');
-							results?.scrollIntoView({ behavior: 'smooth' });
-						}}
+						on:click={makePlan}
 						class="btn bg-secondary-500 text-white font-bold h-12 self-center"
 					>
 						Generate Schedule
@@ -160,8 +157,10 @@
 	>
 		{#if error}
 			<div class="card p-4 w-full variant-filled-error">
-				<div class="text-2xl pb-2">Error</div>
-				<div>{error}</div>
+				<div class="text-2xl pb-2">{error.message}</div>
+				{#each error.array as err}
+					<div class="text-lg">{err}</div>
+				{/each}
 			</div>
 		{:else if Object.keys(plan).length > 0}
 			{#each Object.entries(plan) as [key, value]}
