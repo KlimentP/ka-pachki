@@ -33,14 +33,12 @@
 <Modal components={modalComponentRegistry} />
 
 <ComboBox listBoxStyles="" comboboxValue={item.id} closeQuery="">
-	<svelte:fragment let:popupCombobox slot="button">
-		<button use:popup={popupCombobox}>
+	<svelte:fragment slot="button">
 			<Icon
 				class="text-slate-900 rounded-lg hover:text-primary-500"
 				height="24"
 				icon="ic:baseline-more-horiz"
 			/>
-		</button>
 	</svelte:fragment>
 
 	<div

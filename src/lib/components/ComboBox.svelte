@@ -10,33 +10,34 @@
 		event: 'focus-click',
 		target: comboboxValue,
 		placement: 'bottom',
-		closeQuery,
-
+		closeQuery
 	};
 </script>
 
-<slot name="button" {popupCombobox}>
-<button
-	class="btn btn-sm variant-ghost-primary text-slate-300 hover:text-primary-500"
-	use:popup={popupCombobox}
->
-		{comboboxValue}
-	</button>
-</slot>
+<button class="rounded-2xl" use:popup={popupCombobox}>
+	<slot name="button">
+		<div class="btn btn-sm variant-ghost-primary text-slate-300 hover:text-primary-500">
+			{comboboxValue}
+		</div>
+	</slot>
+</button>
 <div class={listBoxStyles} data-popup={comboboxValue}>
 	<slot name="listItems">
 		<ListBox rounded="rounded-none">
 			{#each listItems as item}
-			<ListBoxItem
-			class="bg-slate-950 "
-			bind:group={comboboxValue}
-			value={comboboxValue}
-			name={item.label}
-			>
-			<a class="flex text-left w-full  text-slate-300 hover:text-primary-500 hover:underline-offset-8 hover:underline"  href={item.url}>
+				<ListBoxItem
+					class="bg-slate-950 "
+					bind:group={comboboxValue}
+					value={comboboxValue}
+					name={item.label}
+				>
+					<a
+						class="flex text-left w-full text-slate-300 hover:text-primary-500 hover:underline-offset-8 hover:underline"
+						href={item.url}
+					>
 						{item.label}
 					</a>
-					</ListBoxItem>
+				</ListBoxItem>
 			{/each}
 		</ListBox>
 	</slot>
