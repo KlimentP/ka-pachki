@@ -12,7 +12,7 @@
 
 
 	export let item: any;
-	export let index: number;
+	export let index: number | string;
 	export let machineOptions : AutocompleteOption[];
 	let selectedOrder = {};
 
@@ -136,8 +136,8 @@
 							selectedItem: selectedOrder,
 							field: 'Order',
 							formType: 'Delete',
-							title:
-								(selectedOrder?.customer_name || '') + ' - ' + (selectedOrder?.design_name || '')
+							title: // @ts-ignore
+								(selectedOrder?.customer_name || '') + ' - ' + (selectedOrder?.design_name || '') 
 						}
 					});
 				}}
