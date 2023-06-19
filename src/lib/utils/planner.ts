@@ -89,6 +89,21 @@ const checkPlanFeasibility = (availableMachines: any,
 		return {feasible: true};
 	}
 
+
+const bundleSameDesignOrders = (orders: any) => {
+	const bundles: Record<string, any> = {};
+	for (const order of orders) {
+		if (bundles[order.design_name]) {
+			bundles[order.design_name].quantity += order.quantity;
+			bundles[order.design_name].minutes_length += order.minutes_length;
+		} else {
+			bundles[order.design_name] = order
+		}
+	}
+	console.log('bundled orders', Object.values(bundles));
+	return Object.values(bundles);
+};
+
 export const generatePlan = async (
 	availableMachines: any,
 	selectedOrders: any,
@@ -100,6 +115,7 @@ export const generatePlan = async (
 	if (feasible === false && message && errorArray) {
 		throw new CustomError(message, errorArray);
 	}
+	const bundledOrders = bundleSameDesignOrders(selectedOrders);
 	const authString = `${env.PUBLIC_OPTIMIZER_USER}:${env.PUBLIC_OPTIMIZER_PASSWORD}`;
 	const encodedAuthString = window.btoa(authString);
 	const headers = new Headers({
@@ -118,7 +134,7 @@ export const generatePlan = async (
 			headers,
 			body: JSON.stringify({
 				machines: availableMachines,
-				orders: selectedOrders,
+				orders: bundledOrders,
 				max_perm_size: maxPermSize,
 			})
 		});
