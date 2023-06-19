@@ -96,9 +96,7 @@ export const generatePlan = async (
 
 	// selectedEmployees: any
 ) => {
-	console.log("first", availableMachines, selectedOrders)
 	const {feasible, message, errorArray} = checkPlanFeasibility(availableMachines, selectedOrders, maxPermSize);
-	console.log(feasible, message);
 	if (feasible === false && message && errorArray) {
 		throw new CustomError(message, errorArray);
 	}
