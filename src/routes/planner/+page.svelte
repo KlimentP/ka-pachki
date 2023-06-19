@@ -13,7 +13,6 @@
 	export let data;
 
 	let { orders, colors } = data;
-	const orderOptions = formatOrderOptions(orders);
 	let maxPermSize = 3;
 	const machineOptions: { [K in Machine]: string } = {
 		butter: 'Butter',
@@ -116,7 +115,7 @@
 	</div>
 	<section
 		id="planner-results"
-		class="flex flex-wrap gap-8 w-full justify-between max-h-screen overflow-y-auto p-4"
+		class="flex flex-wrap gap-8 w-full justify-between p-4"
 	>
 		{#if error}
 			<div class="card p-4 w-full variant-filled-error">

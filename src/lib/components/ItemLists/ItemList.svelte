@@ -64,7 +64,7 @@
 	{#if fiteredItems.length === 0}
 		<p>No {itemPlural} Found</p>
 	{:else}
-		<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 overflow-y-auto max-h-[560px] overflow-x-hidden">
+		<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 overflow-x-hidden">
 			{#each fiteredItems as item (item.name)}
 				<div class="card card-hover rounded-xl shadow-lg">
 					<header
