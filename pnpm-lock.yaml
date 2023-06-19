@@ -81,6 +81,9 @@ devDependencies:
   svelte-check:
     specifier: ^3.0.1
     version: 3.2.0(postcss@8.4.23)(svelte@3.58.0)
+  svelte-headless-table:
+    specifier: ^0.17.3
+    version: 0.17.3(svelte@3.58.0)
   sveltekit-superforms:
     specifier: ^0.8.4
     version: 0.8.4(@sveltejs/kit@1.15.7)(svelte@3.58.0)(zod@3.21.4)
@@ -2948,6 +2951,16 @@ packages:
       - sugarss
     dev: true
 
+  /svelte-headless-table@0.17.3(svelte@3.58.0):
+    resolution: {integrity: sha512-r5IRiE0RA8SPOQK7YxK6XMKAbDX00QG4AbD3sgVTH7magESKpRqe6zLyY5NEZorHsHLWzP8d+YilY/NmfneflQ==}
+    dependencies:
+      svelte-keyed: 1.1.6(svelte@3.58.0)
+      svelte-render: 1.6.0
+      svelte-subscribe: 1.0.5
+    transitivePeerDependencies:
+      - svelte
+    dev: true
+
   /svelte-hmr@0.15.1(svelte@3.58.0):
     resolution: {integrity: sha512-BiKB4RZ8YSwRKCNVdNxK/GfY+r4Kjgp9jCLEy0DuqAKfmQtpL38cQK3afdpjw4sqSs4PLi3jIPJIFp259NkZtA==}
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
@@ -2955,6 +2968,14 @@ packages:
       svelte: '>=3.19.0'
     dependencies:
       svelte: 3.58.0
+
+  /svelte-keyed@1.1.6(svelte@3.58.0):
+    resolution: {integrity: sha512-sd/7j3waSpOkeiQqATstlvNySbEpSs49aoaZ/nc09x/iEndnXQ/9Zy5PTD06+C7hlZk8KjZ4bhrktAQ791jWMQ==}
+    peerDependencies:
+      svelte: ^3.49.0
+    dependencies:
+      svelte: 3.58.0
+    dev: true
 
   /svelte-preprocess@5.0.3(postcss@8.4.23)(svelte@3.58.0)(typescript@5.0.4):
     resolution: {integrity: sha512-GrHF1rusdJVbOZOwgPWtpqmaexkydznKzy5qIC2FabgpFyKN57bjMUUUqPRfbBXK5igiEWn1uO/DXsa2vJ5VHA==}
@@ -3002,6 +3023,16 @@ packages:
       strip-indent: 3.0.0
       svelte: 3.58.0
       typescript: 5.0.4
+    dev: true
+
+  /svelte-render@1.6.0:
+    resolution: {integrity: sha512-Y6Ea6U768MuhH0xR72pAPnXdSnJ+4yi24YyD/b9Q46yGalQFVxUyan496EELWtQEvgQE9Z2PsFAG8JjvrWcDAg==}
+    dependencies:
+      svelte-subscribe: 1.0.5
+    dev: true
+
+  /svelte-subscribe@1.0.5:
+    resolution: {integrity: sha512-p+vRSBVzR9BQC72mjd2eqCv8zx5euLZQJF7QqAw5d41aKzQVOq90y71/NXch+nDNMjWbRo0CX+brcWYgPryJlw==}
     dev: true
 
   /svelte@3.58.0:
