@@ -16,7 +16,7 @@
 
 <button class="rounded-2xl" use:popup={popupCombobox}>
 	<slot name="button">
-		<div class="btn btn-sm variant-ghost-primary text-slate-300 hover:text-primary-500">
+		<div class="btn btn-sm variant-soft-primary text-slate-300 hover:text-primary-500">
 			{comboboxValue}
 		</div>
 	</slot>

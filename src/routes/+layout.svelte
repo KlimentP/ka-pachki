@@ -15,7 +15,7 @@
 	import ComboBox from '$lib/components/ComboBox.svelte';
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
-
+	import { capitalizeString } from '$lib/utils/generic';
 	import { page } from '$app/stores';
 
 	$: ({ supabase, session } = data);
@@ -46,7 +46,9 @@
 		];
 	});
 	dropdowns["designs"] = [...dropdowns["designs"], ...dropdowns["colors"]];
+	dropdowns["orders"] = [...dropdowns["orders"], ...dropdowns["customers"]];
 	delete dropdowns["colors"];
+	delete dropdowns["customers"];
 	
 </script>
 
@@ -55,7 +57,7 @@
 		<!-- App Bar -->
 		<AppBar
 			slotDefault="w-0"
-			padding="max-sm:py-2 p-2"
+			padding="max-sm:py-2 md:p-2"
 			gap="gap-1 md:gap-4"
 			background="bg-slate-950"
 		>
@@ -75,17 +77,17 @@
 					{#if $page.data.session}
 						<a
 							href="/planner"
-							class="btn btn-sm variant-ghost-secondary text-slate-300 hover:text-secondary-500"
+							class="btn btn-sm variant-soft-secondary text-slate-300 hover:text-secondary-500"
 							>Planner</a
 						>
 						{#each Object.keys(dropdowns) as name}
-							<ComboBox comboboxValue={name} listItems={dropdowns[name]} />
+							<ComboBox comboboxValue={capitalizeString(name)} listItems={dropdowns[name]} />
 						{/each}
 						<!-- <ComboBox comboboxValue={'Designs'} listItems={designDropdown} />
 						<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} /> -->
 						<button
 							type="button"
-							class="btn btn-sm text-slate-300 hover:text-primary-500"
+							class="btn btn-sm  text-slate-300 hover:text-primary-500"
 							on:click={signout}>Sign Out</button
 						>
 					{:else}
