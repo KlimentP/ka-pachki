@@ -17,12 +17,9 @@
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { capitalizeString } from '$lib/utils/generic';
 	import { page } from '$app/stores';
-
+	import { signOut } from '$lib/utils/auth';
 	$: ({ supabase, session } = data);
 
-	function signout() {
-		supabase.auth.signOut();
-	}
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
@@ -35,21 +32,20 @@
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
-	const resources = ['customers', 'designs', 'orders', 'colors']
+	const resources = ['customers', 'designs', 'orders', 'colors'];
 
 	const dropdowns = {};
 
-	resources.forEach(( name ) => {
+	resources.forEach((name) => {
 		dropdowns[name] = [
 			{ url: `/${name}/create`, label: `Add ${name}` },
 			{ url: `/${name}`, label: `View ${name}` }
 		];
 	});
-	dropdowns["designs"] = [...dropdowns["designs"], ...dropdowns["colors"]];
-	dropdowns["orders"] = [...dropdowns["orders"], ...dropdowns["customers"]];
-	delete dropdowns["colors"];
-	delete dropdowns["customers"];
-	
+	dropdowns['designs'] = [...dropdowns['designs'], ...dropdowns['colors']];
+	dropdowns['orders'] = [...dropdowns['orders'], ...dropdowns['customers']];
+	delete dropdowns['colors'];
+	delete dropdowns['customers'];
 </script>
 
 <AppShell>
@@ -87,8 +83,8 @@
 						<ComboBox comboboxValue={'Orders'} listItems={ordersDropdown} /> -->
 						<button
 							type="button"
-							class="btn btn-sm  text-slate-300 hover:text-primary-500"
-							on:click={signout}>Sign Out</button
+							class="btn btn-sm text-slate-300 hover:text-primary-500"
+							on:click={() => signOut(supabase)}>Sign Out</button
 						>
 					{:else}
 						<a href="/login" class="btn btn-sm text-slate-300 hover:text-primary-500">Sign In</a>

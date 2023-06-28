@@ -1,13 +1,7 @@
-import { supabaseClient } from "$lib/supabaseClient"
+import { invalidateAll } from '$app/navigation';
 
 
-export async function signOut() {
-    try {
-        const { error } = await supabaseClient.auth.signOut()
-        if (error) throw error
-    } catch (error) {
-        if (error instanceof Error) {
-            alert(error.message)
-        }
-    }
+export async function signOut(supabase) {
+    supabase.auth.signOut()
+    invalidateAll()
 }
